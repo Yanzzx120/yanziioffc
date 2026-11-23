@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masuk — Portal Pembeli</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="css/neo.css">
+<style>
+  .stage-login{display:flex;justify-content:center;padding:70px 22px 60px}
+  .stage-login .card{width:100%;max-width:520px}
+  .hero{height:170px;border:3px solid var(--bd);border-radius:18px;box-shadow:0 2px 22px var(--glow);overflow:hidden;margin-bottom:20px;background:var(--acc)}
+  .foot{margin-top:14px}
+  .foot u{cursor:pointer}
+</style>
+<link rel="stylesheet" href="css/nebula.css">
+<link rel="stylesheet" href="css/fx.css">
+</head>
+<body>
+<script src="js/config.js"></script>
+<script src="js/fx.js"></script>
+<div class="nb-top">
+  <a class="brand" href="login.html"><span class="logo"><i></i></span><span id="brandName">yanziiOffc — Digital Store</span></a>
+  <div class="row" style="flex:0 0 auto;margin-left:auto"></div>
+</div>
+
+<div class="stage-login">
+  <div class="card">
+    <div class="hero" id="heroAnim" data-nosound aria-hidden="true"></div>
+    <span class="badge"><i class="ri-user-3-fill"></i> Created Your Acount</span>
+    <h1 class="t" id="title">Masuk Ke Akun Kamu</h1>
+    <p class="sub">Masuk dulu untuk melihat riwayat pesanan, memakai tools, dan mengelola pembelian.</p>
+
+    <div class="seg">
+      <button type="button" id="tabLogin" class="on"><i class="ri-login-box-line"></i> Masuk</button>
+      <button type="button" id="tabReg"><i class="ri-user-add-line"></i> Daftar</button>
+    </div>
+
+    <form id="form" novalidate>
+      <div id="nameWrap" class="hide">
+        <label class="lbl" for="nama">Nama</label>
+        <div class="field"><i class="ri-user-line"></i><input class="inp" id="nama" type="text" placeholder="Nama lengkap" autocomplete="name"></div>
+      </div>
+
+      <div id="waWrap" class="hide">
+        <label class="lbl" for="wa">No. WhatsApp</label>
+        <div class="field"><i class="ri-whatsapp-line"></i><input class="inp" id="wa" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx atau 62xxxxxxxxxx" autocomplete="tel"></div>
+      </div>
+
+      <label class="lbl" for="email">Email</label>
+      <div class="field"><i class="ri-mail-fill"></i><input class="inp" id="email" type="email" placeholder="email@example.com" autocomplete="email"></div>
+
+      <label class="lbl" for="pass">Password</label>
+      <div class="field"><i class="ri-lock-fill"></i><input class="inp" id="pass" type="password" placeholder="Minimal 8 karakter" autocomplete="current-password">
+        <i class="ri-eye-off-line eye" id="eye"></i></div>
+
+      <div id="msg" class="msg hide"></div>
+
+      <button class="nb-btn dark block" id="submit" type="submit" style="margin-top:22px"><i class="ri-arrow-right-line"></i> <span id="submitTxt">MASUK KE AKUN</span></button>
+    </form>
+
+    <div id="done" class="done-box hide">
+      <div class="big">🎉</div>
+      <h2 style="font-size:22px;font-weight:800;margin:6px 0">Akun berhasil dibuat!</h2>
+      <p class="sub" id="doneTxt">Kirim info akunmu ke admin supaya pesanan lebih cepat diproses.</p>
+      <a class="nb-btn yel block" id="tellAdmin" target="_blank" rel="noopener" style="margin-top:16px"><i class="ri-whatsapp-line"></i> Kirim info ke Admin</a>
+      <button class="nb-btn dark block" id="goOn" type="button" style="margin-top:10px"><i class="ri-arrow-right-line"></i> Lanjut ke Dashboard</button>
+    </div>
+    <hr class="sp" id="sp1">
+    <p class="center sub" id="switchTxt">Belum punya akun? <b style="color:var(--tx);cursor:pointer" id="switchLink">Daftar gratis</b></p>
+    <button class="nb-btn block" id="guest" type="button" style="margin-top:14px;font-size:14px"><i class="ri-skip-forward-fill"></i> Lanjut tanpa akun</button>
+    <p class="small center foot">Ini adalah akun khusus <b>pembeli</b>.<br>Untuk akun admin, hubungi <a href="https://wa.me/6285842176747" id="adminLink"><u>admin via WhatsApp</u></a>.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  $('brandName').textContent = SHOP.brand;
+  $('adminLink').href = 'https://wa.me/' + SHOP.wa;
+  const MIN = 8;
+  let mode = 'login';
+
+  // sudah login -> langsung masuk
+  function safeNext(){ const n = new URLSearchParams(location.search).get('next') || ''; return /^[\w'.\-]+\.html(#\w+)?$/.test(n) ? n : 'index.html'; }
+  function sessionOk(){
+    try{
+      let u = null;
+      if (sessionStorage.getItem('isLoggedIn') === 'true') u = JSON.parse(sessionStorage.getItem('loggedUser') || 'null');
+      return !!u && (!u.guest || SHOP.allowGuest);
+    }catch(e){ return false; }
+  }
+  if (sessionOk()) location.replace(safeNext());
+  if (!SHOP.allowGuest){ $('guest').classList.add('hide'); }
+  if (new URLSearchParams(location.search).get('need')) setTimeout(()=>{ const m=$('msg'); m.textContent='🔒 Masuk atau daftar akun dulu untuk mengakses halaman ini.'; m.className='msg'; },0);
+
+  function setMode(m){
+    mode = m;
+    const reg = m === 'register';
+    $('tabLogin').classList.toggle('on', !reg); $('tabReg').classList.toggle('on', reg);
+    $('nameWrap').classList.toggle('hide', !reg); $('waWrap').classList.toggle('hide', !reg);
+    $('title').textContent = reg ? 'Buat Akun Baru' : 'Masuk ke Akun Kamu';
+    $('submitTxt').textContent = reg ? 'DAFTAR SEKARANG' : 'MASUK KE AKUN';
+    $('pass').autocomplete = reg ? 'new-password' : 'current-password';
+    $('switchTxt').innerHTML = reg
+      ? 'Sudah punya akun? <b style="color:var(--tx);cursor:pointer" id="switchLink">Masuk</b>'
+      : 'Belum punya akun? <b style="color:var(--tx);cursor:pointer" id="switchLink">Daftar gratis</b>';
+    $('switchLink').onclick = () => setMode(reg ? 'login' : 'register');
+    showMsg('');
+  }
+  function showMsg(t, ok){
+    const m = $('msg'); m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'err') + (t ? '' : ' hide');
+  }
+  function normWa(v){ v = String(v||'').replace(/\D/g,''); if (v.startsWith('0')) v = '62' + v.slice(1); else if (v.startsWith('8')) v = '62' + v; return v; }
+  function store(k, v){ try{ localStorage.setItem(k, v); return true; }catch(e){ return false; } }
+  function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+
+  // hash password (SHA-256) supaya tidak tersimpan polos
+  async function hash(s){
+    if (!(window.crypto && crypto.subtle)) return 'plain:' + s;
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('yz|' + s));
+    return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
+  }
+  function enter(user){
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('loggedUser', JSON.stringify(user));
+    try{ localStorage.removeItem('session_v1'); }catch(e){}
+    location.href = safeNext();
+  }
+
+  $('tabLogin').onclick = () => setMode('login');
+  $('tabReg').onclick = () => setMode('register');
+  $('switchLink').onclick = () => setMode('register');
+  $('eye').onclick = () => {
+    const p = $('pass'), show = p.type === 'password';
+    p.type = show ? 'text' : 'password';
+    $('eye').className = (show ? 'ri-eye-line' : 'ri-eye-off-line') + ' eye';
+  };
+  $('guest').onclick = () => enter({nama:'Tamu', email:'', guest:true});
+
+  $('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('email').value.trim().toLowerCase(), pass = $('pass').value, nama = $('nama').value.trim(), wa = normWa($('wa').value);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMsg('Format email tidak valid.');
+    if (pass.length < MIN) return showMsg('Password minimal ' + MIN + ' karakter.');
+    const key = 'user_' + email, raw = load(key);
+    $('submit').disabled = true;
+    try{
+      const h = await hash(pass);
+      if (mode === 'register'){
+        if (!nama) return showMsg('Nama wajib diisi.');
+        if (!/^62\d{8,13}$/.test(wa)) return showMsg('Nomor WhatsApp tidak valid (contoh 08123456789).');
+        if (raw) return showMsg('Email sudah terdaftar, silakan masuk.');
+        if (!store(key, JSON.stringify({nama, email, wa, h}))) return showMsg('Penyimpanan browser diblokir. Aktifkan cookie/penyimpanan situs.');
+        const user = {nama, email, wa}, txt = buyerText('🆕 BUYER BARU TERDAFTAR', user);
+        const sent = await notifyAdmin(txt);
+        showMsg('');
+        ['form','sp1','switchTxt','guest'].forEach(i => $(i).classList.add('hide')); document.querySelector('.seg').classList.add('hide');
+        $('title').textContent = 'Selamat datang, ' + nama + '!'; $('done').classList.remove('hide');
+        $('tellAdmin').href = waLink(txt); $('goOn').onclick = () => enter(user);
+        if (sent){ $('doneTxt').textContent = 'Info akunmu sudah dikirim otomatis ke admin. Silakan lanjut.'; $('tellAdmin').classList.add('hide'); }
+      } else {
+        if (!raw) return showMsg('Email belum terdaftar. Silakan daftar dulu.');
+        const u = JSON.parse(raw);
+        // kompatibel dengan akun lama (password tersimpan polos)
+        const okPass = u.h ? u.h === h : u.password === pass;
+        if (!okPass) return showMsg('Password salah.');
+        if (!u.h) store(key, JSON.stringify({nama:u.nama, email:u.email, wa:u.wa||'', h}));
+        enter({nama:u.nama, email:u.email, wa:u.wa||''});
+      }
+    } finally { $('submit').disabled = false; }
+  });
+})();
+</script>
+<script src="js/login-anim.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/bg3d.js"></script>
+</body>
+</html>
