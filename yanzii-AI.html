@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>yanzii-AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Load highlight.js untuk syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+<link rel="stylesheet" href="css/neo.css">
+<link rel="stylesheet" href="css/neo-ai.css">
+<link rel="stylesheet" href="css/nebula.css">
+<link rel="stylesheet" href="css/fx.css">
+</head>
+<body>
+<script src="js/config.js"></script>
+<script src="js/ai-client.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/guard.js"></script>
+<div id="siteNav"></div>
+  <div class="chat-wrapper">
+    <header class="chat-header">yanzii-AI <button type="button" id="clear-btn" title="Hapus riwayat chat" style="float:right;background:rgba(255,255,255,.12);color:#d5e1ee;border:2px solid rgba(255,255,255,.35);border-radius:10px;padding:4px 10px;font-weight:700;cursor:pointer;font-family:inherit">🗑 Hapus</button></header>
+    <div id="chat-container" class="chat-container">
+      <div id="typing-indicator" class="typing-indicator" style="display: none;">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <button id="upload-btn" class="upload-btn" title="Upload file">📎</button>
+      <input type="file" id="file-upload" accept="image/*,.pdf,.txt,.md,.json,.csv,.js,.html,.css,.py" hidden>
+      <textarea id="message-input" placeholder="Tulis pesan... (Shift+Enter untuk baris baru)"></textarea>
+      <button id="send-button" disabled>Kirim</button>
+    </div>
+    <div id="upload-progress" class="upload-progress" style="display:none">
+      <div id="progress-bar" class="progress-bar"></div>
+      <div id="progress-text" class="progress-text">0%</div>
+    </div>
+  </div>
+
+  <div id="file-description-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h3>Deskripsi File</h3>
+      <input id="file-description" type="text" placeholder="Tambahkan deskripsi...">
+      <button id="send-file-button">Kirim File</button>
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const messageInput = $('message-input'), sendButton = $('send-button'), chatContainer = $('chat-container'), typingIndicator = $('typing-indicator'),
+      fileUpload = $('file-upload'), uploadBtn = $('upload-btn'), uploadProgress = $('upload-progress'), progressBar = $('progress-bar'), progressText = $('progress-text'),
+      modal = $('file-description-modal'), fileDescriptionInput = $('file-description'), sendFileButton = $('send-file-button');
+    const toast = (t, k) => window.FX ? FX.toast(t, k) : alert(t);
+    const me = (window.buyer && buyer().email) || 'tamu', HK = 'ai_hist_' + me;
+    let uploadedFile = null, chatHistory = [], isSending = false;
+
+    /* ---------- riwayat tersimpan ---------- */
+    function save(){ try{ localStorage.setItem(HK, JSON.stringify(chatHistory.map(h => ({role: h.role, parts: h.parts.filter(p => p.text)})).filter(h => h.parts.length).slice(-40))); }catch(e){} }
+    function restore(){
+      let h = []; try{ h = JSON.parse(localStorage.getItem(HK) || '[]'); }catch(e){}
+      if (!h.length){ addMessage('yanzii-AI', 'Halo! 👋 Saya yanzii-AI. Tanya apa saja — kode, ide produk, atau bantuan seputar toko. Kamu juga bisa kirim gambar, PDF, atau file teks (📎).', 'ai-message'); return; }
+      chatHistory = h; h.forEach(m => addMessage(m.role === 'user' ? 'Anda' : 'yanzii-AI', m.parts.map(p => p.text).join('\n'), m.role === 'user' ? 'user-message' : 'ai-message'));
+    }
+    $('clear-btn').onclick = () => { if (!confirm('Hapus semua riwayat chat?')) return; chatHistory = []; try{ localStorage.removeItem(HK); }catch(e){}
+      chatContainer.querySelectorAll('.chat-message').forEach(n => n.remove()); restore(); toast('Riwayat dihapus'); };
+
+    /* ---------- input ---------- */
+    messageInput.addEventListener('input', () => { sendButton.disabled = messageInput.value.trim() === '' || isSending; messageInput.style.height = 'auto'; messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px'; });
+    messageInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); if (!sendButton.disabled) sendMessage(); } });
+    sendButton.addEventListener('click', sendMessage);
+    uploadBtn.addEventListener('click', () => fileUpload.click());
+    fileUpload.addEventListener('change', handleFileUpload);
+    document.querySelector('.close-modal').addEventListener('click', closeModal);
+    sendFileButton.addEventListener('click', sendFileWithDescription);
+    function closeModal(){ modal.style.display = 'none'; fileDescriptionInput.value = ''; uploadedFile = null; fileUpload.value = ''; }
+    window.closeModal = closeModal;
+
+    async function sendMessage(){
+      const text = messageInput.value.trim(); if (!text || isSending) return;
+      addMessage('Anda', text, 'user-message'); chatHistory.push({role: 'user', parts: [{text}]});
+      messageInput.value = ''; messageInput.style.height = '50px'; sendButton.disabled = true; await callAIAndRender();
+    }
+
+    /* ---------- upload: gambar & PDF dikirim ke model, file teks dibaca isinya ---------- */
+    const isTextFile = f => /^text\//.test(f.type) || /\.(txt|md|json|csv|js|html|css|py)$/i.test(f.name);
+    function handleFileUpload(e){
+      const file = e.target.files[0]; if (!file) return;
+      if (file.size > 10 * 1024 * 1024){ toast('Ukuran file maksimal 10MB.', 'err'); fileUpload.value = ''; return; }
+      const asText = isTextFile(file); uploadProgress.style.display = 'block'; progressBar.style.width = '0%'; progressText.textContent = '0%';
+      const r = new FileReader();
+      r.onprogress = ev => { if (ev.lengthComputable){ const p = Math.round(ev.loaded / ev.total * 100); progressBar.style.width = p + '%'; progressText.textContent = p + '%'; } };
+      r.onload = () => { uploadedFile = {data: r.result, text: asText, mimeType: file.type || (asText ? 'text/plain' : 'application/octet-stream'), name: file.name, isImage: file.type.startsWith('image/')};
+        uploadProgress.style.display = 'none'; modal.style.display = 'flex'; fileDescriptionInput.focus(); };
+      r.onerror = () => { uploadProgress.style.display = 'none'; toast('Gagal membaca file.', 'err'); };
+      asText ? r.readAsText(file) : r.readAsDataURL(file);
+    }
+    async function sendFileWithDescription(){
+      if (!uploadedFile) return; const f = uploadedFile, desc = fileDescriptionInput.value.trim() || 'Tolong analisis file ini.';
+      if (f.isImage) addImageMessage('Anda', f.data, f.name, desc); else addMessage('Anda', '📎 ' + f.name + '\n' + desc, 'user-message');
+      const parts = [];
+      if (f.isImage || (!f.text && /pdf/i.test(f.mimeType))) parts.push({inline_data: {mime_type: f.mimeType, data: f.data.split(',')[1]}});
+      parts.push({text: desc + (f.text ? '\n\n--- Isi file ' + f.name + ' ---\n' + String(f.data).slice(0, 30000) : (f.isImage || /pdf/i.test(f.mimeType) ? '' : '\n\n(Nama file: ' + f.name + ' — tipe ini tidak bisa dibaca)'))});
+      chatHistory.push({role: 'user', parts}); closeModal(); await callAIAndRender();
+    }
+
+    /* ---------- panggil AI: Worker sendiri → Gemini langsung → layanan gratis cadangan ---------- */
+    async function callAIAndRender(){
+      isSending = true; sendButton.disabled = true; typingIndicator.style.display = 'flex'; chatContainer.scrollTop = chatContainer.scrollHeight;
+      const lastUser = chatHistory[chatHistory.length - 1], plain = lastUser && lastUser.parts.length === 1 && lastUser.parts[0].text;
+      try{
+        const text = await AIClient.ask(chatHistory);
+        addMessage('yanzii-AI', text, 'ai-message'); chatHistory.push({role: 'model', parts: [{text}]}); save(); if (window.Snd) Snd.notify();
+      }catch(err){
+        addMessage('yanzii-AI', '⚠️ ' + err.message + (plain ? '\n\nPesanmu dikembalikan ke kolom ketik — tekan Kirim untuk mencoba lagi.' : ''), 'ai-message');
+        chatHistory.pop(); if (plain && !messageInput.value){ messageInput.value = plain; messageInput.dispatchEvent(new Event('input')); }
+      }
+      finally{ typingIndicator.style.display = 'none'; isSending = false; sendButton.disabled = messageInput.value.trim() === ''; }
+    }
+
+    /* ---------- tampilan ---------- */
+    function addMessage(sender, text, cls){
+      const m = document.createElement('div'); m.className = 'chat-message ' + cls;
+      const h = document.createElement('div'); h.className = 'message-header'; h.textContent = sender;
+      const c = document.createElement('div'); c.className = 'message-content'; c.innerHTML = formatMessage(text);
+      c.querySelectorAll('pre code').forEach(code => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Salin'; b.className = 'copy-button';
+        Object.assign(b.style, {position: 'absolute', top: '8px', right: '8px', background: '#0284c7', color: '#fff', border: 'none', borderRadius: '6px', padding: '3px 9px', cursor: 'pointer', fontSize: '12px'});
+        b.onclick = () => navigator.clipboard.writeText(code.innerText).then(() => toast('Kode disalin', 'ok')).catch(() => toast('Gagal menyalin', 'err'));
+        code.parentElement.style.position = 'relative'; code.parentElement.appendChild(b);
+      });
+      m.append(h, c); chatContainer.insertBefore(m, typingIndicator); chatContainer.scrollTop = chatContainer.scrollHeight;
+      if (window.hljs) c.querySelectorAll('pre code').forEach(b => { try{ hljs.highlightElement(b); }catch(e){} });
+    }
+    function addImageMessage(sender, src, name, desc){
+      const m = document.createElement('div'); m.className = 'chat-message user-message';
+      const h = document.createElement('div'); h.className = 'message-header'; h.textContent = sender;
+      const c = document.createElement('div'); c.className = 'message-content';
+      const i = document.createElement('img'); i.src = src; i.alt = name; Object.assign(i.style, {maxWidth: '100%', borderRadius: '12px', marginBottom: '10px'});
+      const p = document.createElement('p'); p.textContent = desc; c.append(i, p); m.append(h, c); chatContainer.insertBefore(m, typingIndicator); chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    function formatMessage(text){
+      const blocks = [];
+      text = String(text).replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => { blocks.push('<pre><code class="language-' + (lang || 'plaintext') + '">' + esc(code) + '</code></pre>'); return '\u0000C' + (blocks.length - 1) + '\u0000'; });
+      text = esc(text)
+        .replace(/^#{1,6}\s+(.+)$/gm, '<strong>$1</strong>')
+        .replace(/^\s*[*-]\s+/gm, '• ')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^\s*][^*\n]*)\*/g, '<em>$1</em>')
+        .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#bae6fd">$1</a>')
+        .replace(/\n/g, '<br>');
+      return text.replace(/\u0000C(\d+)\u0000/g, (_, i) => blocks[+i]);
+    }
+    restore();
+  </script>
+<script src="js/nav.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/bg3d.js"></script>
+<script src="js/clock.js"></script>
+</body>
+</html>

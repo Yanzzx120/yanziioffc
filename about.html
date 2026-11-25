@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    
+    <title>About - Portfolio Website</title>
+<link rel="stylesheet" href="css/neo.css">
+<link rel="stylesheet" href="css/neo-site.css">
+<link rel="stylesheet" href="css/nebula.css">
+<link rel="stylesheet" href="css/fx.css">
+<style>
+.ab-sec{margin-top:26px}.ab-sec>h2{font-size:22px;font-weight:800;margin-bottom:12px}
+.ab-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.ab-card{background:var(--card);border:3px solid var(--bd);border-radius:18px;box-shadow:0 3px 30px var(--glow);padding:16px;color:inherit;text-decoration:none;display:block}
+.ab-card b{display:block;font-size:16px;margin-bottom:4px}.ab-card span{color:var(--mut);font-size:14px;line-height:1.5}
+.ab-ic{font-size:26px;display:block;margin-bottom:6px}
+.ab-chips{display:flex;flex-wrap:wrap;gap:8px}.ab-chips span{background:var(--acc);color:var(--tx);border:2px solid var(--bd);border-radius:999px;padding:6px 14px;font-weight:700;font-size:13px}
+.ab-steps{counter-reset:s;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.ab-steps .ab-card:before{counter-increment:s;content:counter(s);display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--acc);color:var(--tx);align-items:center;justify-content:center;font-weight:800;margin-bottom:8px}
+.ab-cta{display:flex;gap:10px;flex-wrap:wrap}.ab-cta a{display:inline-block;background:var(--acc);color:var(--tx);border:3px solid var(--bd);border-radius:14px;padding:10px 18px;font-weight:800;text-decoration:none}
+</style>
+</head>
+
+<body>
+<script src="js/config.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/guard.js"></script>
+
+    
+    <div id="siteNav"></div>
+<div class="about-container">
+        <div class="about-content" id="aboutContent">
+            
+            <div class="about-header">
+                <h1>About Me</h1>
+            </div>
+
+            
+            <div class="about-grid">
+                <div class="about-image">
+                    <img src="https://files.catbox.moe/aub0sl.png" alt="About Image">
+                </div>
+                <div class="about-text">
+                    <h2>Who yanzii?</h2>
+                    <p>I'm a passionate developer and designer with a keen eye for detail and a drive for creating
+                        innovative digital solutions. With expertise in web development, UI/UX design, and content
+                        creation, I bring ideas to life through code and creativity.</p>
+                    <p>My journey in technology began with a simple curiosity and has evolved into a professional
+                        pursuit of excellence in digital craftsmanship.yanzii?
+
+                    <div class="stats">
+                        <div class="stat-item"
+                            onclick="showProjects()">
+                            <h3>50+</h3>
+                            <p>Projects Completed</p>
+                        </div>
+                        <div class="stat-item"
+                            onclick="showExperience()">
+                            <h3>1+</h3>
+                            <p>Years Experience</p>
+                        </div>
+                        <div class="stat-item"
+                            onclick="showClients()">
+                            <h3>35+</h3>
+                            <p>Happy Clients</p>
+                        </div>
+                        <div class="stat-item"
+                            onclick="showAwards()">
+                            <h3>20+</h3>
+                            <p>Awards Won</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <script>
+
+            
+            
+
+            // Fungsi untuk menampilkan menu hamburger
+            function hamburg() {
+                const navbar = document.querySelector(".dropdown")
+                navbar.style.transform = "translateY(0px)"
+            }
+
+            // Fungsi untuk menyembunyikan menu hamburger
+            function cancel() {
+                const navbar = document.querySelector(".dropdown")
+                navbar.style.transform = "translateY(-500px)"
+            }
+
+            // Fungsi untuk menampilkan daftar Project
+            function showProjects() {
+                const aboutContent = document.getElementById('aboutContent');
+                aboutContent.innerHTML = `
+                <a href="about.html" class="back-button" onclick="restoreInitialContent()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <div class="about-header">
+                    <h1>My Projects</h1>
+                </div>
+                <div class="content-grid">
+                    ${generateProjectCards()}
+                </div>
+            `;
+                
+            }
+
+            // Fungsi untuk menampilkan daftar Experience
+            function showExperience() {
+                const aboutContent = document.getElementById('aboutContent');
+                aboutContent.innerHTML = `
+                <a href="about.html" class="back-button" onclick="restoreInitialContent()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <div class="about-header">
+                    <h1>My Experience</h1>
+                </div>
+                <div class="content-grid">
+                    ${generateExperienceCards()}
+                </div>
+            `;
+                
+            }
+
+            // Fungsi untuk menampilkan daftar Clients
+            function showClients() {
+                const aboutContent = document.getElementById('aboutContent');
+                aboutContent.innerHTML = `
+                <a href="about.html" class="back-button" onclick="restoreInitialContent()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <div class="about-header">
+                    <h1>Client Success Stories</h1>
+                </div>
+                <div class="content-grid">
+                    ${generateClientCards()}
+                </div>
+            `;
+                
+            }
+
+            // Fungsi untuk menampilkan daftar Awards
+            function showAwards() {
+                const aboutContent = document.getElementById('aboutContent');
+                aboutContent.innerHTML = `
+                <a href="about.html" class="back-button" onclick="restoreInitialContent()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <div class="about-header">
+                    <h1>Awards & Recognition</h1>
+                </div>
+                <div class="content-grid">
+                    ${generateAwardCards()}
+                </div>
+            `;
+                
+            }
+
+            // Fungsi pembantu untuk menghasilkan kartu project
+            function generateProjectCards() {
+                const projects = [
+                    {
+                        title: "E-Commerce Platform",
+                        image: "img/yann.jpg",
+                        description: "A full-stack e-commerce solution with payment integration",
+                        technologies: ["React", "Node.js", "MongoDB"]
+                    },
+                    {
+                        title: "Portfolio Website",
+                        image: "img/yann.jpg",
+                        description: "Responsive portfolio website with modern animations",
+                        technologies: ["HTML", "CSS", "JavaScript"]
+                    },
+                    {
+                        title: "Task Management App",
+                        image: "img/yann.jpg",
+                        description: "Mobile-first task management application",
+                        technologies: ["Vue.js", "Firebase"]
+                    }
+                    // Add more projects as needed
+                ];
+
+                return projects.map(project => `
+                <div class="content-card">
+                    <div class="card-image">
+                        <img src="${project.image}" alt="${project.title}">
+                    </div>
+                    <div class="card-info">
+                        <h3>${project.title}</h3>
+                        <p>${project.description}</p>
+                        <div class="technologies">
+                            ${project.technologies.map(tech => `
+                                <span class="technology-tag">${tech}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            }
+
+            // Fungsi pembantu untuk menghasilkan kartu experience
+            function generateExperienceCards() {
+                const experiences = [
+                    {
+                        title: "Senior Web Developer",
+                        company: "Tech Solutions Inc.",
+                        period: "2021 - Present",
+                        description: "Leading frontend development team and implementing modern web solutions"
+                    },
+                    {
+                        title: "Frontend Developer",
+                        company: "Digital Agency",
+                        period: "2019 - 2021",
+                        description: "Developed responsive websites and web applications"
+                    }
+                    // Add more experiences as needed
+                ];
+
+                return experiences.map(exp => `
+                <div class="content-card">
+                    <div class="card-info">
+                        <h3>${exp.title}</h3>
+                        <h4>${exp.company}</h4>
+                        <p class="period">${exp.period}</p>
+                        <p>${exp.description}</p>
+                    </div>
+                </div>
+            `).join('');
+            }
+
+            // Fungsi pembantu untuk menghasilkan kartu client
+            function generateClientCards() {
+                const clients = [
+                    {
+                        name: "yann",
+                        company: "Innovation Corp",
+                        image: "img/yann.jpg",
+                        testimonial: "Outstanding work on our company website redesign!"
+                    },
+                    {
+                        name: "yann",
+                        company: "Tech Startup",
+                        image: "img/yann.jpg",
+                        testimonial: "Delivered our app ahead of schedule with excellent quality"
+                    }
+                    // Add more clients as needed
+                ];
+
+                return clients.map(client => `
+                <div class="content-card">
+                    <div class="card-image">
+                        <img src="${client.image}" alt="${client.name}">
+                    </div>
+                    <div class="card-info">
+                        <h3>${client.name}</h3>
+                        <h4>${client.company}</h4>
+                        <p class="client-testimonial">"${client.testimonial}"</p>
+                    </div>
+                </div>
+            `).join('');
+            }
+
+            // Fungsi pembantu untuk menghasilkan kartu award
+            function generateAwardCards() {
+                const awards = [
+                    {
+                        title: "Best Web Design",
+                        organization: "Design Awards 2025",
+                        description: "Recognition for exceptional web design and user experience"
+                    },
+                    {
+                        title: "Innovation Award",
+                        organization: "Tech Summit 2025",
+                        description: "Awarded for innovative use of emerging technologies"
+                    }
+                    // Add more awards as needed
+                ];
+
+                return awards.map(award => `
+                <div class="content-card">
+                    <div class="card-info">
+                        <div class="award-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3>${award.title}</h3>
+                        <h4>${award.organization}</h4>
+                        <p>${award.description}</p>
+                    </div>
+                </div>
+            `).join('');
+            }
+
+
+            // ===== Konten tambahan About (edit teks di sini) =====
+            (function(){
+                const box = document.getElementById('aboutContent'); if(!box || !window.SHOP) return;
+                const E=(t,c,x)=>{const e=document.createElement(t); if(c) e.className=c; if(x!==undefined) e.textContent=x; return e;};
+                function sec(title){ const d=E('div','ab-sec'); d.appendChild(E('h2','',title)); box.appendChild(d); return d; }
+                function card(parent,ic,t,d,href){ const a=E(href?'a':'div','ab-card'); if(href) a.href=href; if(ic) a.appendChild(E('span','ab-ic',ic)); a.appendChild(E('b','',t)); a.appendChild(E('span','',d)); parent.appendChild(a); }
+
+                let d=sec('Tentang yanziiOffc'); 
+                d.appendChild(E('p','',SHOP.brand+' adalah toko digital & kreatif: tempat belanja hosting, VPS, panel bot, script, aplikasi premium, top up game, pulsa, sampai layanan sosial media dalam satu situs. Semua pesanan dibuat otomatis lewat invoice dengan pembayaran QRIS atau e-wallet, lalu diproses admin.'));
+                d.lastChild.style.cssText='color:var(--mut);line-height:1.7';
+
+                d=sec('Yang Kami Sediakan'); let g=E('div','ab-grid'); d.appendChild(g);
+                (SHOP.cats||[]).forEach(c=>card(g,c.icon,c.name,c.desc,'produk.html#'+c.id));
+
+                d=sec('Keahlian'); g=E('div','ab-chips'); d.appendChild(g);
+                ['HTML & CSS','JavaScript','Node.js','Bot WhatsApp','Bot Telegram','Cloudflare Workers','UI / UX','Setup VPS & Hosting','Otomasi Order','Desain Grafis'].forEach(x=>g.appendChild(E('span','',x)));
+
+                d=sec('Kenapa Pilih Kami'); g=E('div','ab-grid'); d.appendChild(g);
+                card(g,'⚡','Order Otomatis','Invoice dan kode unik dibuat langsung, tanpa tanya-tanya lama.');
+                card(g,'💳','Bayar Mudah','QRIS dan e-wallet ('+(SHOP.ewallets||[]).map(w=>w.name).join(', ')+').');
+                card(g,'💬','Admin Responsif','Kirim bukti bayar lewat WhatsApp, pesanan segera diproses.');
+                card(g,'🏷️','Harga Jelas','Harga tampil di setiap produk, ada voucher diskon untuk pembeli.');
+
+                d=sec('Cara Order'); g=E('div','ab-steps'); d.appendChild(g);
+                card(g,'','Pilih Produk','Buka Toko, pilih kategori lalu produk yang kamu mau.');
+                card(g,'','Isi Data','Lengkapi form (username, ID game, link target, dll).');
+                card(g,'','Bayar','Scan QRIS atau transfer e-wallet sesuai total di invoice.');
+                card(g,'','Konfirmasi','Tekan "Saya Sudah Bayar" lalu kirim bukti ke admin via WhatsApp.');
+
+                d=sec('Fakta Singkat'); g=E('div','ab-grid'); d.appendChild(g);
+                card(g,'🗂️',String((SHOP.cats||[]).length)+' Kategori','Dari hosting sampai pulsa & PPOB.');
+                card(g,'📦',String((SHOP.products||[]).length)+' Produk','Katalog terus bertambah.');
+                card(g,'📈',String((SHOP.products||[]).filter(p=>p.cat==='smm').length)+' Layanan Sosmed','Instagram, TikTok, YouTube, Facebook, X, Telegram, dan lainnya.');
+                card(g,'🛠️','Tools Gratis','Brat, IQC, TikTok Downloader, QR, kompres gambar.','tools.html');
+
+                d=sec('Hubungi Saya'); g=E('div','ab-cta'); d.appendChild(g);
+                let a=E('a','','📲 WhatsApp Admin'); a.href='https://wa.me/'+SHOP.wa; a.target='_blank'; a.rel='noopener'; g.appendChild(a);
+                a=E('a','','🛍️ Ke Toko'); a.href='produk.html'; g.appendChild(a);
+                a=E('a','','✉️ Kontak'); a.href='contact.html'; g.appendChild(a);
+            })();
+
+            // Fungsi untuk mengembalikan konten awal
+            function restoreInitialContent() {
+                const aboutContent = document.getElementById('aboutContent');
+                aboutContent.innerHTML = `
+                <div class="about-header">
+                    <h1>About Me</h1>
+                </div>
+                <div class="about-grid">
+                    <div class="about-image">
+                        <img src="img/yann.jpg" alt="About Image">
+                    </div>
+                    <div class="about-text">
+                        <h2>Who Am I?</h2>
+                        <p>I'm a passionate developer and designer with a keen eye for detail and a drive for creating
+                            innovative digital solutions. With expertise in web development, UI/UX design, and content
+                            creation, I bring ideas to life through code and creativity.</p>
+                        <p>My journey in technology began with a simple curiosity and has evolved into a professional
+                            pursuit of excellence in digital craftsmanship.</p>
+
+                        <div class="stats">
+                            <div class="stat-item" onclick="showProjects()">
+                                <h3>50+</h3>
+                                <p>Projects Completed</p>
+                            </div>
+                            <div class="stat-item" onclick="showExperience()">
+                                <h3>3+</h3>
+                                <p>Years Experience</p>
+                            </div>
+                            <div class="stat-item" onclick="showClients()">
+                                <h3>20+</h3>
+                                <p>Happy Clients</p>
+                            </div>
+                            <div class="stat-item" onclick="showAwards()">
+                                <h3>15+</h3>
+                                <p>Awards Won</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+                
+            }
+
+        </script>
+<script src="js/nav.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/bg3d.js"></script>
+<script src="js/clock.js"></script>
+</body>
+
+</html>
+

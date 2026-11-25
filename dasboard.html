@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Yanzii</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="css/neo.css">
+<style>
+ .quick{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));margin-top:14px}
+ .ord{border:2px solid var(--bd);border-radius:14px;padding:14px;margin-top:12px;background:var(--card)}
+ .ord .h{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+ .mini{display:flex;justify-content:space-between;align-items:center;gap:10px;border:2px solid var(--bd);border-radius:12px;padding:10px 12px;margin-top:10px;background:var(--card);color:inherit;text-decoration:none}
+ .mini b{font-size:14px}.mini small{color:var(--mut);display:block;font-size:12px;margin-top:2px}.mini .pr{font-weight:800;white-space:nowrap;text-align:right}
+ .mini .pr small{font-weight:600}.low{color:#f87171}
+ .brk{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));margin-top:12px}
+ .brk div{border:2px solid var(--bd);border-radius:12px;padding:10px;text-align:center;background:var(--card)}.brk b{display:block;font-size:20px}.brk span{font-size:12px;color:var(--mut)}
+</style>
+<link rel="stylesheet" href="css/nebula.css">
+<link rel="stylesheet" href="css/fx.css">
+</head>
+<body>
+<script src="js/config.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/guard.js"></script>
+<div id="siteNav"></div>
+
+<div class="page">
+  <span class="badge">📊 DASHBOARD</span>
+  <h1 class="t" id="hello">Halo!</h1>
+  <p class="sub" id="who"></p>
+
+  <div class="stat-grid">
+    <div class="stat"><b id="sAll">0</b><span>Total pesanan</span></div>
+    <div class="stat"><b id="sWait">0</b><span>Menunggu bayar</span></div>
+    <div class="stat"><b id="sPaid">0</b><span>Dibayar / selesai</span></div>
+    <div class="stat"><b id="sSum">Rp0</b><span>Total belanja</span></div>
+  </div>
+
+  <div class="panel"><h2>Aktivitas 7 Hari</h2><p class="sub" style="margin-top:4px">Jumlah pesanan per hari</p><div class="chart" id="chart"></div></div>
+
+  <div class="panel"><h2>Kategori Produk</h2><div class="cat-grid" id="catGrid"></div></div>
+
+  <div class="panel"><h2>Ringkasan Toko</h2>
+    <div class="stat-grid" style="margin-top:12px">
+      <div class="stat"><b id="tProd">0</b><span>Total produk</span></div>
+      <div class="stat"><b id="tCat">0</b><span>Kategori</span></div>
+      <div class="stat"><b id="tSmm">0</b><span>Layanan sosmed</span></div>
+      <div class="stat"><b id="tVc">0</b><span>Voucher aktif</span></div>
+    </div>
+  </div>
+
+  <div class="panel"><h2>Status Pesanan</h2><div class="brk" id="brk"></div></div>
+
+  <div class="panel"><h2>📈 Suntik Sosmed</h2><p class="sub" style="margin-top:4px">Harga & sisa stok layanan sosial media</p><div id="smmList"></div>
+    <div class="row" style="margin-top:14px"><a class="nb-btn yel" href="produk.html#smm">Lihat semua layanan</a></div></div>
+
+  <div class="panel"><h2>🔥 Produk Populer</h2><div id="popList"></div></div>
+
+  <div class="panel"><h2>🏷️ Voucher</h2><div id="vcList"></div></div>
+
+  <div class="panel"><h2>Akses Cepat</h2>
+    <div class="quick">
+      <a class="nb-btn yel" href="tools.html#brat">🟩 Brat</a>
+      <a class="nb-btn yel" href="tools.html#bratvideo">🎬 Brat Video</a>
+      <a class="nb-btn yel" href="tools.html#iqc">💬 IQC</a>
+      <a class="nb-btn yel" href="tools.html#tiktok">🎵 TikTok</a>
+      <a class="nb-btn yel" href="tools.html#catbox">📦 Catbox</a>
+      <a class="nb-btn" href="produk.html">🛍️ Ke Toko</a>
+      <a class="nb-btn" href="produk.html#smm">📈 Suntik Sosmed</a>
+      <a class="nb-btn" href="service.html">🧰 Layanan</a>
+      <a class="nb-btn" href="about.html">👤 About</a>
+      <a class="nb-btn" href="yanzii-AI.html">🤖 yanzii-AI</a>
+      <a class="nb-btn" href="Alqur'an.html">📖 Al-Qur'an</a>
+    </div>
+  </div>
+
+  <div class="panel"><h2>Pesanan Terbaru</h2><div id="orders"><p class="sub" style="margin-top:10px">Belum ada pesanan.</p></div>
+    <div class="row" style="margin-top:14px"><a class="nb-btn" href="produk.html">Buat pesanan baru</a></div></div>
+
+  <div class="panel"><h2>Akun</h2>
+    <p class="sub" id="acc" style="margin:8px 0 14px"></p>
+    <div class="row"><a class="nb-btn yel" id="tellAdmin" target="_blank" rel="noopener">📲 Kirim info akun ke Admin</a><a class="nb-btn" id="loginBtn" href="login.html">Masuk / Daftar</a><button class="nb-btn dark" id="logout" type="button">Keluar</button></div>
+  </div>
+  <p class="footer-nb">© <span id="yr"></span> <span class="bn">Yanzii</span></p>
+</div>
+
+<script src="js/nav.js"></script>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const CT=(el,v,f)=>window.FX?FX.count(el,v,f):(el.textContent=f?f(v):v);
+  let u=null; try{ u=JSON.parse(sessionStorage.getItem('loggedUser')||'null'); }catch(e){}
+  u=u||{nama:'Tamu',guest:true};
+  $('hello').textContent='Halo, '+(u.nama||'Tamu')+'!'; $('yr').textContent=new Date().getFullYear(); document.querySelector('.bn').textContent=SHOP.brand;
+  $('who').textContent=u.guest?'Kamu masuk sebagai tamu. Daftar akun agar datamu mudah dikenali.':'Masuk sebagai '+u.email;
+  $('acc').textContent=u.guest?'Mode tamu — pesanan tersimpan di perangkat ini.':(u.nama+' • '+u.email+(u.wa?' • +'+u.wa:''));
+  $('tellAdmin').href=waLink(buyerText('👤 INFO BUYER',u)); if(u.guest) $('tellAdmin').classList.add('hide');
+  setTimeout(()=>window.FX&&FX.toast('Selamat datang, '+(u.nama||'Tamu')+'! 👋','ok'),1800);
+  if(!u.guest) $('loginBtn').classList.add('hide');
+  $('logout').onclick=()=>{ sessionStorage.removeItem('isLoggedIn'); sessionStorage.removeItem('loggedUser'); try{localStorage.removeItem('session_v1');}catch(e){} location.href='login.html'; };
+  let all=[]; try{ all=JSON.parse(localStorage.getItem('orders_v1')||'[]'); }catch(e){}
+  all=all.filter(o=>!o.owner||o.owner===(u.guest?'':u.email));
+  all.forEach(o=>{ if(o.status==='menunggu'&&Date.now()>o.expires) o.status='expired'; });
+  CT($('sAll'),all.length);
+  CT($('sWait'),all.filter(o=>o.status==='menunggu').length);
+  const paid=all.filter(o=>o.status==='dibayar'||o.status==='diproses'||o.status==='lunas'||o.status==='selesai');
+  CT($('sPaid'),paid.length); CT($('sSum'),paid.reduce((a,o)=>a+o.total,0),rupiah);
+  // grafik 7 hari (jam live dipasang oleh js/clock.js, sama seperti halaman lain)
+  const days=[...Array(7)].map((_,i)=>{ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-(6-i)); return d; });
+  const cnt=days.map(d=>all.filter(o=>o.created>=d.getTime()&&o.created<d.getTime()+864e5).length), mx=Math.max(1,...cnt), ch=$('chart');
+  days.forEach((d,i)=>{ const c=document.createElement('div'); c.innerHTML='<span class="v"></span><i></i><span></span>'; c.children[0].textContent=cnt[i]; c.children[2].textContent=d.toLocaleDateString('id-ID',{weekday:'short'}); ch.appendChild(c); });
+  setTimeout(()=>ch.querySelectorAll('i').forEach((el,i)=>{ el.style.height=(4+Math.round(cnt[i]/mx*100))+'px'; }),350);
+  const LBL={menunggu:['MENUNGGU BAYAR','wait'],dibayar:['MENUNGGU VERIFIKASI','wait'],diproses:['DIPROSES','wait'],lunas:['LUNAS • ADMIN PROSES','ok'],selesai:['SELESAI','ok'],expired:['KEDALUWARSA','bad']};
+  if(all.length){ const box=$('orders'); box.innerHTML='';
+    all.slice(0,5).forEach(o=>{ const [t,k]=LBL[o.status]||LBL.menunggu, d=document.createElement('div'); d.className='ord';
+      d.innerHTML='<div class="h"><b></b><span class="tag '+k+'">'+t+'</span></div><p class="sub" style="margin-top:6px"></p>';
+      d.querySelector('b').textContent=o.id; d.querySelector('p').textContent=o.item+' x'+o.qty+' — '+rupiah(o.total)+' — '+new Date(o.created).toLocaleString('id-ID'); box.appendChild(d); }); }
+})();
+</script>
+<script>
+(function(){
+  if(!window.SHOP) return;
+  const $=id=>document.getElementById(id), P=SHOP.products||[], ST=SHOP.stock||{};
+  const CT=(el,v)=>window.FX?FX.count(el,v):(el.textContent=v);
+  CT($('tProd'),P.length); CT($('tCat'),(SHOP.cats||[]).length); CT($('tSmm'),P.filter(p=>p.cat==='smm').length); CT($('tVc'),Object.keys(SHOP.vouchers||{}).length);
+
+  // status pesanan (pesanan akun ini)
+  let u=null; try{ u=JSON.parse(sessionStorage.getItem('loggedUser')||'null'); }catch(e){} u=u||{guest:true};
+  let all=[]; try{ all=JSON.parse(localStorage.getItem('orders_v1')||'[]'); }catch(e){}
+  all=all.filter(o=>!o.owner||o.owner===(u.guest?'':u.email));
+  all.forEach(o=>{ if(o.status==='menunggu'&&Date.now()>o.expires) o.status='expired'; });
+  [['menunggu','Menunggu bayar'],['dibayar','Verifikasi'],['diproses','Diproses'],['lunas','Lunas'],['selesai','Selesai'],['expired','Kedaluwarsa']].forEach(x=>{
+    const d=document.createElement('div'), b=document.createElement('b'), sp=document.createElement('span');
+    b.textContent=all.filter(o=>o.status===x[0]).length; sp.textContent=x[1]; d.append(b,sp); $('brk').appendChild(d); });
+
+  function row(p){
+    const a=document.createElement('a'); a.className='mini'; a.href='produk.html#'+p.cat;
+    const l=document.createElement('div'), b=document.createElement('b'), sm=document.createElement('small');
+    b.textContent=p.name; sm.textContent=p.desc; l.append(b,sm);
+    const r=document.createElement('div'); r.className='pr'; r.textContent=rupiah(p.price);
+    const n=ST[p.id], sk=document.createElement('small');
+    if(n!==undefined){ sk.textContent=n>0?'Sisa '+n:'Stok habis'; if(n<=10) sk.className='low'; r.appendChild(sk); }
+    a.append(l,r); return a;
+  }
+  P.filter(p=>p.cat==='smm').slice(-12).forEach(p=>$('smmList').appendChild(row(p)));
+  const pop=P.filter(p=>p.badge==='POPULER').slice(0,8); pop.forEach(p=>$('popList').appendChild(row(p)));
+  if(!pop.length) $('popList').innerHTML='<p class="sub" style="margin-top:10px">Belum ada produk populer.</p>';
+  const vc=SHOP.vouchers||{}, vl=$('vcList');
+  Object.keys(vc).forEach(k=>{ const d=document.createElement('div'); d.className='mini'; const b=document.createElement('b'), t=document.createElement('span'); b.textContent=k; t.className='pr'; t.textContent=vc[k].desc||''; d.append(b,t); vl.appendChild(d); });
+  if(!Object.keys(vc).length) vl.innerHTML='<p class="sub" style="margin-top:10px">Belum ada voucher.</p>';
+})();
+</script>
+<script src="js/sound.js"></script>
+<script src="js/bg3d.js"></script>
+<script src="js/clock.js"></script>
+</body>
+</html>
