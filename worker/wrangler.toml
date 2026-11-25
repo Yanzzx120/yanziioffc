@@ -1,0 +1,13 @@
+name = "yanzii-order"
+main = "order.js"
+compatibility_date = "2024-11-01"
+
+[[kv_namespaces]]
+binding = "ORDERS"
+id = "ISI_ID_KV_NAMESPACE"   # dari: npx wrangler kv namespace create ORDERS
+
+[vars]
+ADMIN_WA = "6285842176747"
+TG_CHAT_ID = ""                              # chat id Telegram admin (lihat README-ORDER.md)
+# WA_API_URL = ""                            # opsional, hanya jika punya WA API
+ALLOW_ORIGIN = ""                            # isi domain tokomu, mis. https://yanziioffc.my.id
