@@ -13,7 +13,7 @@ window.SHOP = {
   loginVideo: "img/login.mp4",
   sounds: {click:"sound/klik.mp3", success:"sound/ok.mp3", error:"sound/error.mp3", hover:"sound/hover.mp3", key:"sound/key.mp3", pop:"sound/pop.mp3", open:"sound/open.mp3", close:"sound/close.mp3", notify:"sound/notify.mp3", coin:"sound/coin.mp3", whoosh:"sound/whoosh.mp3"},  // tema "In Another Life" (nada A-minor, dreamy)
   soundVolume: 0.5,
-  music: "sound/lagu-latar.mp3",   // musik latar (tombol 🎵). Ganti file ini kalau punya lagu sendiri
+  music: "sound/sound.mp3",   // musik latar (tombol 🎵). Ganti file ini kalau punya lagu sendiri
   musicVolume: 1.10,
 
   /* Proxy CORS milik sendiri (opsional tapi disarankan, lihat worker/proxy.js).
