@@ -14,7 +14,7 @@ window.SHOP = {
   sounds: {click:"sound/klik.mp3", success:"sound/ok.mp3", error:"sound/error.mp3", hover:"sound/hover.mp3", key:"sound/key.mp3", pop:"sound/pop.mp3", open:"sound/open.mp3", close:"sound/close.mp3", notify:"sound/notify.mp3", coin:"sound/coin.mp3", whoosh:"sound/whoosh.mp3"},  // tema "In Another Life" (nada A-minor, dreamy)
   soundVolume: 0.5,
   music: "sound/lagu-latar.mp3",   // musik latar (tombol 🎵). Ganti file ini kalau punya lagu sendiri
-  musicVolume: 0.35,
+  musicVolume: 0.65,
 
   /* Proxy CORS milik sendiri (opsional tapi disarankan, lihat worker/proxy.js).
      Contoh: "https://proxy-kamu.workers.dev/?url=" */
@@ -43,7 +43,7 @@ window.SHOP = {
   notifyUrl: "",
 
   /* Kode voucher (contoh — ubah sesuai kebutuhan). type: pct = persen, flat = potongan rupiah */
-  vouchers: { "YANZII10": {type:"pct", v:10, desc:"Diskon 10%"}, "HEMAT5K": {type:"flat", v:5000, desc:"Potongan Rp5.000"} },
+  vouchers: { "MN-10RXY": {type:"pct", v:10, desc:"Diskon 15%"}, "HEMAT7K": {type:"flat", v:7000, desc:"Potongan Rp7.000"} },
 
   /* Kategori: id, nama, ikon, warna kartu, deskripsi singkat */
   cats: [
