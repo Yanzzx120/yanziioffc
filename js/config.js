@@ -23,7 +23,7 @@ window.SHOP = {
   /* Pembayaran memakai QRIS sendiri (a.n. yannLytr) — bayar lalu tekan "Saya Sudah Bayar", admin cek & proses.
      Ganti gambar QRIS lewat qrisImage di atas (link gambar atau file lokal, mis. "img/qris.jpg"). */
   qrisName: "YANNLYTR , DIGITAL & KREATIF",
-  cs: "",   // nomor WhatsApp CS (awalan 62), opsional — memunculkan tombol "Kirim ke CS" di halaman bayar
+  cs: "6285842176747",   // nomor WhatsApp CS (awalan 62), opsional — memunculkan tombol "Kirim ke CS" di halaman bayar
 
   /* Sisa stok yang tampil di toko (isi manual, ubah angkanya tiap stok berubah). Kunci = nama produk persis.
      Contoh: stock: {"Netflix Premium": 5, "Capcut Pro": 12}. 0 = "Stok habis" (tombol beli nonaktif). Produk yang tidak ditulis = tanpa label stok. */
@@ -43,7 +43,7 @@ window.SHOP = {
   notifyUrl: "(POST {6285842176747, hallo yanzii, saya mau order product})",
 
   /* Kode voucher (contoh — ubah sesuai kebutuhan). type: pct = persen, flat = potongan rupiah */
-  vouchers: { "MN-10RXY25": {type:"pct", v:15, desc:"Diskon 15%"}, "HEMAT10K": {type:"flat", v:10000, desc:"Potongan Rp10.000"} },
+  vouchers: { "MN-10RXY25": {type:"pct", v:15, desc:"Diskon 15%"}, "HEMAT 15.000": {type:"flat", v:15000, desc:"Potongan Rp15.000"} },
 
   /* Kategori: id, nama, ikon, warna kartu, deskripsi singkat */
   cats: [
@@ -232,7 +232,7 @@ window.SHOP = {
     P("smm","Followers Shopee","1.000 followers toko",28000,"paket");
     P("smm","Followers Pinterest","1.000 followers",28000,"paket");
     P("smm","Followers LinkedIn","500 followers",42000,"paket");
-    P("smm","Paket Hemat All Sosmed","TikTok: 1K followers, 1K like, 10K view",450000,"paket","HEMAT");
+    P("smm","Paket Hemat All Sosmed","TikTok: 1K followers, 1K like, 10K view",45000,"paket","HEMAT");
     return L; })()
 };
 /* stok awal produk suntik sosmed (acak). Ubah angkanya tiap stok berubah; 0 = habis */
