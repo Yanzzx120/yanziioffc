@@ -14,7 +14,7 @@ window.SHOP = {
   sounds: {click:"sound/klik.mp3", success:"sound/ok.mp3", error:"sound/error.mp3", hover:"sound/hover.mp3", key:"sound/key.mp3", pop:"sound/pop.mp3", open:"sound/open.mp3", close:"sound/close.mp3", notify:"sound/notify.mp3", coin:"sound/coin.mp3", whoosh:"sound/whoosh.mp3"},  // tema "In Another Life" (nada A-minor, dreamy)
   soundVolume: 0.5,
   music: "sound/musik.mp3",   // musik latar (tombol 🎵). Ganti file ini kalau punya lagu sendiri
-  musicVolume: 1.50,
+  musicVolume: 1.25,
 
   /* Proxy CORS milik sendiri (opsional tapi disarankan, lihat worker/proxy.js).
      Contoh: "https://proxy-kamu.workers.dev/?url=" */
@@ -43,7 +43,7 @@ window.SHOP = {
   notifyUrl: "",
 
   /* Kode voucher (contoh — ubah sesuai kebutuhan). type: pct = persen, flat = potongan rupiah */
-  vouchers: { "MN-10RXY25": {type:"pct", v:10, desc:"Diskon 15%"}, "HEMAT10K": {type:"flat", v:10.000, desc:"Potongan Rp10.000"} },
+  vouchers: { "MN-10RXY25": {type:"pct", v:15, desc:"Diskon 15%"}, "HEMAT10K": {type:"flat", v:10000, desc:"Potongan Rp10.000"} },
 
   /* Kategori: id, nama, ikon, warna kartu, deskripsi singkat */
   cats: [
@@ -132,9 +132,9 @@ window.SHOP = {
     P("sewabot","Sewa Bot 1 Grup","Bot aktif di 1 grup",5000,"bulan");
     P("sewabot","Sewa Bot 5 Grup","Bot aktif di 5 grup",15000,"bulan","HEMAT");
     P("sewabot","Sewa Bot Unlimited","Grup tanpa batas",30000,"bulan");
-    P("smm","Followers Instagram","1.000 followers",15000,"paket");
-    P("smm","Like TikTok","1.000 likes",8000,"paket");
-    P("smm","View TikTok","10.000 views",5000,"paket");
+    P("smm","Followers Instagram","1.000 followers",21000,"paket");
+    P("smm","Like TikTok","1.000 likes",38000,"paket");
+    P("smm","View TikTok","10.000 views",6300,"paket");
     P("game","Diamond Mobile Legends","86 Diamond • via ID",22000,"top up");
     P("game","Diamond Free Fire","70 Diamond • via ID",10000,"top up");
     P("game","Robux Roblox","80 Robux",15000,"top up");
@@ -175,10 +175,10 @@ window.SHOP = {
     P("sewabot","Sewa Bot Musik","Putar lagu di grup • semua fitur",3000,"bulan");
     P("sewabot","Sewa Bot AI","Chat AI & downloader di grup",5000,"bulan");
     P("smm","Subscribers YouTube","100 subscribers",45000,"paket");
-    P("smm","Followers TikTok","1.000 followers",20000,"paket");
-    P("smm","Like Instagram","1.000 likes",6000,"paket");
-    P("smm","Views Instagram Reels","10.000 views",5000,"paket");
-    P("smm","Followers Facebook","1.000 followers",18000,"paket");
+    P("smm","Followers TikTok","1.000 followers",40000,"paket");
+    P("smm","Like Instagram","1.000 likes",38000,"paket");
+    P("smm","Views Instagram Reels","10.000 views",7000,"paket");
+    P("smm","Followers Facebook","1.000 followers",25000,"paket");
     P("game","Diamond Mobile Legends 172","172 Diamond • via ID",42000,"top up","POPULER");
     P("game","Weekly Diamond Pass","Mobile Legends • 80 Diamond + bonus harian",28000,"top up");
     P("game","Diamond Free Fire 140","140 Diamond • via ID",19000,"top up");
@@ -195,44 +195,44 @@ window.SHOP = {
     P("ppob","Saldo GoPay 50K","Top up saldo GoPay",52000,"saldo");
     P("ppob","Saldo OVO 50K","Top up saldo OVO",52000,"saldo");
     P("ppob","Saldo ShopeePay 50K","Top up saldo ShopeePay",52000,"saldo");
-    /* ===== SUNTIK SOSMED (ALL PLATFORM) — harga contoh, ubah sesuai modal ===== */
-    P("smm","Followers Instagram 5K","5.000 followers • non-drop",65000,"paket","HEMAT");
-    P("smm","Followers Instagram 10K","10.000 followers • non-drop",120000,"paket");
-    P("smm","Like Instagram 5K","5.000 likes • instan",25000,"paket");
-    P("smm","Story View Instagram","1.000 story views",4000,"paket");
-    P("smm","Komentar Instagram","10 komentar random",8000,"paket");
-    P("smm","Views Instagram Reels 100K","100.000 views • cepat",30000,"paket","HEMAT");
-    P("smm","Followers TikTok 5K","5.000 followers • non-drop",90000,"paket","POPULER");
-    P("smm","Like TikTok 5K","5.000 likes • instan",35000,"paket");
-    P("smm","View TikTok 100K","100.000 views • cepat",25000,"paket","HEMAT");
-    P("smm","Share TikTok","1.000 shares",6000,"paket");
-    P("smm","Save/Favorit TikTok","1.000 saves",6000,"paket");
-    P("smm","Komentar TikTok","10 komentar random",9000,"paket");
-    P("smm","Live View TikTok","100 penonton live • 30 menit",15000,"paket");
-    P("smm","View YouTube 1K","1.000 views • aman",25000,"paket");
-    P("smm","Watchtime YouTube","4.000 jam tayang",350000,"paket");
-    P("smm","Like YouTube","1.000 likes",15000,"paket");
-    P("smm","Komentar YouTube","10 komentar random",12000,"paket");
-    P("smm","Views YouTube Shorts","10.000 views",20000,"paket");
-    P("smm","Like Facebook","1.000 likes postingan",9000,"paket");
-    P("smm","Followers Fanspage Facebook","1.000 followers fanspage",20000,"paket");
-    P("smm","View Video Facebook","10.000 views",8000,"paket");
-    P("smm","Followers Twitter / X","1.000 followers",30000,"paket");
-    P("smm","Like Twitter / X","1.000 likes",12000,"paket");
-    P("smm","Retweet Twitter / X","500 retweets",10000,"paket");
-    P("smm","Member Channel Telegram","1.000 members",15000,"paket");
-    P("smm","View Post Telegram","10.000 views",5000,"paket");
-    P("smm","Reaksi Telegram","1.000 reaksi",6000,"paket");
-    P("smm","Followers Threads","1.000 followers",22000,"paket");
-    P("smm","Followers Saluran WhatsApp","1.000 followers channel",25000,"paket");
-    P("smm","Followers Spotify","1.000 followers",28000,"paket");
-    P("smm","Play Spotify","10.000 plays",30000,"paket");
-    P("smm","Followers Twitch","1.000 followers",30000,"paket");
-    P("smm","Member Discord","1.000 members server",35000,"paket");
-    P("smm","Followers Shopee","1.000 followers toko",20000,"paket");
-    P("smm","Followers Pinterest","1.000 followers",20000,"paket");
-    P("smm","Followers LinkedIn","500 followers",30000,"paket");
-    P("smm","Paket Hemat All Sosmed","IG + TikTok: 1K followers, 1K like, 10K view",39000,"paket","HEMAT");
+    /* ===== SUNTIK SOSMED (ALL PLATFORM) — harga pasaran Nov 2026 + 40% ===== */
+    P("smm","Followers Instagram 5K","5.000 followers • non-drop",98000,"paket","HEMAT");
+    P("smm","Followers Instagram 10K","10.000 followers • non-drop",182000,"paket");
+    P("smm","Like Instagram 5K","5.000 likes • instan",56000,"paket");
+    P("smm","Story View Instagram","1.000 story views",4200,"paket");
+    P("smm","Komentar Instagram","10 komentar random",11000,"paket");
+    P("smm","Views Instagram Reels 100K","100.000 views • cepat",49000,"paket","HEMAT");
+    P("smm","Followers TikTok 5K","5.000 followers • non-drop",126000,"paket","POPULER");
+    P("smm","Like TikTok 5K","5.000 likes • instan",56000,"paket");
+    P("smm","View TikTok 100K","100.000 views • cepat",47500,"paket","HEMAT");
+    P("smm","Share TikTok","1.000 shares",8400,"paket");
+    P("smm","Save/Favorit TikTok","1.000 saves",8400,"paket");
+    P("smm","Komentar TikTok","10 komentar random",12500,"paket");
+    P("smm","Live View TikTok","100 penonton live • 30 menit",21000,"paket");
+    P("smm","View YouTube 1K","1.000 views • aman",30000,"paket");
+    P("smm","Watchtime YouTube","4.000 jam tayang",367500,"paket");
+    P("smm","Like YouTube","1.000 likes",32000,"paket");
+    P("smm","Komentar YouTube","10 komentar random",17000,"paket");
+    P("smm","Views YouTube Shorts","10.000 views",21000,"paket");
+    P("smm","Like Facebook","1.000 likes postingan",30000,"paket");
+    P("smm","Followers Fanspage Facebook","1.000 followers fanspage",25000,"paket");
+    P("smm","View Video Facebook","10.000 views",11000,"paket");
+    P("smm","Followers Twitter / X","1.000 followers",39000,"paket");
+    P("smm","Like Twitter / X","1.000 likes",30000,"paket");
+    P("smm","Retweet Twitter / X","500 retweets",14000,"paket");
+    P("smm","Member Channel Telegram","1.000 members",21000,"paket");
+    P("smm","View Post Telegram","10.000 views",7000,"paket");
+    P("smm","Reaksi Telegram","1.000 reaksi",8400,"paket");
+    P("smm","Followers Threads","1.000 followers",31000,"paket");
+    P("smm","Followers Saluran WhatsApp","1.000 followers channel",35000,"paket");
+    P("smm","Followers Spotify","1.000 followers",39000,"paket");
+    P("smm","Play Spotify","10.000 plays",42000,"paket");
+    P("smm","Followers Twitch","1.000 followers",42000,"paket");
+    P("smm","Member Discord","1.000 members server",49000,"paket");
+    P("smm","Followers Shopee","1.000 followers toko",28000,"paket");
+    P("smm","Followers Pinterest","1.000 followers",28000,"paket");
+    P("smm","Followers LinkedIn","500 followers",42000,"paket");
+    P("smm","Paket Hemat All Sosmed","IG + TikTok: 1K followers, 1K like, 10K view",450000,"paket","HEMAT");
     return L; })()
 };
 /* stok awal produk suntik sosmed (acak). Ubah angkanya tiap stok berubah; 0 = habis */
