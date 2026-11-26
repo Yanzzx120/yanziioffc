@@ -231,9 +231,7 @@ async function createOrder(r){
 const fmtNo = n => ('0' + String(n || '').replace(/\D/g, '').replace(/^62/, '')).replace(/(\d{4})(?=\d)/g, '$1-');
 function fillAdminNo(){
   const link = (n, label) => '<a href="https://wa.me/' + String(n).replace(/\D/g, '') + '" target="_blank" rel="noopener" style="color:inherit"><b>' + fmtNo(n) + '</b></a>' + (label ? ' <small>(' + label + ')</small>' : '');
-  let h = '<span><i class="ri-whatsapp-line"></i> Admin' + (SHOP.cs && SHOP.cs !== SHOP.wa ? '' : '/CS') + ': ' + link(SHOP.wa) + '</span>';
-  if (SHOP.cs && SHOP.cs !== SHOP.wa) h += '<span><i class="ri-customer-service-2-line"></i> CS: ' + link(SHOP.cs) + '</span>';
-  $('adminNo').innerHTML = h;
+  $('adminNo').innerHTML = '<span><i class="ri-whatsapp-line"></i> Admin/CS: ' + link(SHOP.wa) + '</span>';
 }
 function setMethod(m){ $('mtabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === m)); $('waBox').classList.toggle('hide', m !== 'wa'); $('qrisBox').classList.toggle('hide', m !== 'qris'); $('walletBox').classList.toggle('hide', m !== 'wallet'); }
 $('mtabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; setMethod(b.dataset.m); if (b.dataset.m === 'wa') payViaWa(); };
@@ -244,7 +242,7 @@ function payViaWa(){
   const t = orderText(o, '🛒 MAU BAYAR — metode: WhatsApp Admin/CS') + '\nMohon kirim cara pembayaran. Terima kasih 🙏';
   window.open('https://wa.me/' + (SHOP.cs || SHOP.wa) + '?text=' + encodeURIComponent(t), '_blank');
 }
-$('paidCs').onclick = () => sendProof(SHOP.cs || SHOP.wa);
+$('paidCs').onclick = () => sendProof(SHOP.wa);
 $('cpAmt').onclick = async () => { const o = getOrders().find(x => x.id === activeId); if (!o) return; try{ await navigator.clipboard.writeText(String(o.total)); FX.toast('Nominal disalin: ' + rupiah(o.total), 'ok'); }catch(e){} };
 $('dlQr').onclick = async () => { const src = $('qris').src; try{ const b = await (await fetch(src)).blob(), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'qris-' + activeId + '.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }catch(e){ window.open(src, '_blank'); } };
 function showPay(o){
@@ -297,10 +295,8 @@ async function sendProof(target){
   if (o.status === 'menunggu'){ o.status = 'dibayar'; o.paidAt = Date.now(); setOrders(all); renderOrders(); }
   const t = orderText(o, '💰 SUDAH BAYAR — mohon verifikasi') + '\n*Bukti transfer:* terlampir (screenshot)';
   notifyAdmin(t);
-  try{ if (f && navigator.canShare && navigator.canShare({files: [f]})){ await navigator.share({files: [f], text: t}); hide(dlg); return; } }
-  catch(e){ if (e && e.name === 'AbortError') return; }
-  window.open('https://wa.me/' + target + '?text=' + encodeURIComponent(t), '_blank');
-  FX.toast('Chat Admin/CS terbuka — kirim pesan & lampirkan bukti transfer.', 'ok'); hide(dlg);
+  window.open('https://wa.me/' + String(target || SHOP.wa).replace(/\D/g, '') + '?text=' + encodeURIComponent(t), '_blank');
+  FX.toast('Chat WhatsApp owner terbuka — kirim pesan & lampirkan screenshot bukti transfer.', 'ok'); hide(dlg);
 }
 $('paid').onclick = () => sendProof(SHOP.wa);
 
