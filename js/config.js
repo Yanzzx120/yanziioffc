@@ -14,7 +14,7 @@ window.SHOP = {
   sounds: {click:"sound/klik.mp3", success:"sound/ok.mp3", error:"sound/error.mp3", hover:"sound/hover.mp3", key:"sound/key.mp3", pop:"sound/pop.mp3", open:"sound/open.mp3", close:"sound/close.mp3", notify:"sound/notify.mp3", coin:"sound/coin.mp3", whoosh:"sound/whoosh.mp3"},  // tema "In Another Life" (nada A-minor, dreamy)
   soundVolume: 0.5,
   music: "sound/musik.mp3",   // musik latar (tombol 🎵). Ganti file ini kalau punya lagu sendiri
-  musicVolume: 0.95,
+  musicVolume: 1.50,
 
   /* Proxy CORS milik sendiri (opsional tapi disarankan, lihat worker/proxy.js).
      Contoh: "https://proxy-kamu.workers.dev/?url=" */
@@ -43,7 +43,7 @@ window.SHOP = {
   notifyUrl: "",
 
   /* Kode voucher (contoh — ubah sesuai kebutuhan). type: pct = persen, flat = potongan rupiah */
-  vouchers: { "MN-10RXY": {type:"pct", v:10, desc:"Diskon 15%"}, "HEMAT7K": {type:"flat", v:7000, desc:"Potongan Rp7.000"} },
+  vouchers: { "MN-10RXY25": {type:"pct", v:10, desc:"Diskon 15%"}, "HEMAT10K": {type:"flat", v:10.000, desc:"Potongan Rp10.000"} },
 
   /* Kategori: id, nama, ikon, warna kartu, deskripsi singkat */
   cats: [
@@ -98,14 +98,14 @@ window.SHOP = {
     P("panel","Panel Bot 2GB","1 server • 2GB RAM • 1 vCore",3000,"bulan","POPULER");
     P("panel","Panel Bot 4GB","1 server • 4GB RAM • 2 vCore",5000,"bulan");
     P("panel","Panel Unlimited","RAM & CPU unlimited",12000,"bulan");
-    P("panel","Reseller Panel","Buat & jual panel sendiri",25000,"bulan");
-    P("panel","Admin Panel","Akses admin penuh + server sendiri",40000,"bulan");
+    P("panel","Reseller Panel","Buat & jual panel sendiri",15000,"bulan");
+    P("panel","Admin Panel","Akses admin penuh + server sendiri",20000,"bulan");
     P("domain","Domain .my.id","Registrasi 1 tahun",15000,"tahun");
     P("domain","Domain .web.id","Registrasi 1 tahun",20000,"tahun");
     P("domain","Domain .xyz","Registrasi 1 tahun",25000,"tahun");
     P("domain","Domain .com","Registrasi 1 tahun",160000,"tahun","POPULER");
     P("domain","Subdomain + SSL","Subdomain pribadi + SSL aktif",5000,"sekali");
-    P("prem","Alight Motion Premium","Akun premium Alight Motion",3000,"taun");
+    P("prem","Alight Motion Premium","Akun premium Alight Motion",3000,"tahun");
     P("prem","Capcut Pro","Tanpa watermark • semua fitur Pro",7000,"bulan","POPULER");
     P("prem","Canva Pro","Template & fitur Pro tanpa batas",5000,"bulan");
     P("prem","Viu Premium","Nonton tanpa iklan",5000,"bulan");
@@ -115,9 +115,9 @@ window.SHOP = {
     P("dev","Website Toko / Store","Katalog + order WhatsApp • responsif",70000,"project");
     P("dev","Website Portofolio","Desain modern • siap hosting",40000,"project");
     P("dev","Landing Page","1 halaman • cepat & ringan",25000,"project");
-    P("dev","Buat Bot WhatsApp / Telegram","Fitur sesuai request",35000,"project","POPULER");
+    P("dev","Buat Bot WhatsApp / Telegram","Fitur sesuai request",30000,"project","POPULER");
     P("dev","Fix Error Script / Website","Debug sampai berjalan normal",15000,"kasus");
-    P("dev","Install Hosting / NodeJS / VPS","Setup server sampai siap pakai",20000,"kasus");
+    P("dev","Install Hosting / NodeJS / VPS","Setup server sampai siap pakai",10000,"kasus");
     P("nokos","Nokos WhatsApp","Nomor virtual Indonesia • OTP masuk di web",3000,"OTP","POPULER");
     P("nokos","Nokos Telegram","Nomor virtual • OTP masuk di web",3000,"OTP");
     P("nokos","Nokos Google / Gmail","Nomor virtual • OTP masuk di web",4000,"OTP");
@@ -145,7 +145,7 @@ window.SHOP = {
     P("vps","VPS Windows RDP 4GB","Windows Server • akses RDP • 2 Core",90000,"bulan");
     P("panel","Panel Bot 6GB","1 server • 6GB RAM • 2 vCore",7000,"bulan");
     P("panel","Panel Bot 8GB","1 server • 8GB RAM • 3 vCore",9000,"bulan");
-    P("panel","Partner Panel","Jadi partner • harga khusus + support",35000,"bulan");
+    P("panel","Partner Panel","Jadi partner • harga khusus + support",30000,"bulan");
     P("domain","Domain .biz.id","Registrasi 1 tahun",15000,"tahun");
     P("domain","Domain .site","Registrasi 1 tahun",20000,"tahun");
     P("domain","Domain .store","Registrasi 1 tahun",30000,"tahun");
@@ -168,12 +168,12 @@ window.SHOP = {
     P("nokos","Nokos Discord","Nomor virtual • OTP masuk di web",4000,"OTP");
     P("nokos","Nokos X (Twitter)","Nomor virtual • OTP masuk di web",4000,"OTP");
     P("nokos","Nokos Shopee","Nomor virtual • OTP masuk di web",5000,"OTP");
-    P("script","Script Downloader Bot","TikTok, IG, YouTube, FB dalam satu bot",20000,"script");
-    P("script","Script Website Store","Template toko online + panel admin",30000,"script");
-    P("script","Script Bot Discord","Bot Discord siap pakai • slash command",20000,"script");
-    P("script","Script Auto Order","Order & pembayaran otomatis (QRIS)",40000,"script","POPULER");
-    P("sewabot","Sewa Bot Musik","Putar lagu di grup • semua fitur",8000,"bulan");
-    P("sewabot","Sewa Bot AI","Chat AI & downloader di grup",12000,"bulan");
+    P("script","Script Downloader Bot","TikTok, IG, YouTube, FB dalam satu bot",2000,"script");
+    P("script","Script Website Store","Template toko online + panel admin",20000,"script");
+    P("script","Script Bot Discord","Bot Discord siap pakai • slash command",10000,"script");
+    P("script","Script Auto Order","Order & pembayaran otomatis (QRIS)",25000,"script","POPULER");
+    P("sewabot","Sewa Bot Musik","Putar lagu di grup • semua fitur",3000,"bulan");
+    P("sewabot","Sewa Bot AI","Chat AI & downloader di grup",5000,"bulan");
     P("smm","Subscribers YouTube","100 subscribers",45000,"paket");
     P("smm","Followers TikTok","1.000 followers",20000,"paket");
     P("smm","Like Instagram","1.000 likes",6000,"paket");
