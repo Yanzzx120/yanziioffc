@@ -76,7 +76,8 @@
     </div>
     <div id="walletBox" class="hide"><p class="sub" style="margin-top:12px;font-size:12.5px">Transfer <b>tepat</b> sesuai nominal, lalu tekan “Saya Sudah Bayar”. Setelah itu kirim bukti transfer ke admin.</p><div id="wallets"></div></div>
     <div style="margin-top:14px"><label class="lbl">Bukti transfer (screenshot) — <b>WAJIB</b></label><input type="file" id="proof" accept="image/*" class="inp"><img id="proofPrev" alt="Bukti transfer" class="hide" style="width:100%;max-height:220px;object-fit:contain;border:2px solid var(--bd);border-radius:12px;margin-top:8px"><p class="sub" style="font-size:12.5px;margin-top:6px">Upload screenshot bukti bayar dulu, baru tombol “Saya Sudah Bayar” aktif. <b>Tanpa bukti transfer, pesanan tidak diproses.</b></p></div>
-    <div class="row" style="margin-top:18px"><button class="nb-btn" id="close2">Tutup</button><button class="nb-btn" id="paidCs" style="display:none;opacity:.45" disabled><i class="ri-customer-service-2-line"></i> Kirim ke CS</button><button class="nb-btn yel" id="paid" disabled style="opacity:.45"><i class="ri-whatsapp-line"></i> Saya Sudah Bayar</button></div>
+    <div class="pay-line" id="adminNo" style="margin-top:18px;flex-wrap:wrap;gap:6px"></div>
+    <div class="row" style="margin-top:10px"><button class="nb-btn" id="close2">Tutup</button><button class="nb-btn" id="paidCs" style="display:none;opacity:.45" disabled><i class="ri-customer-service-2-line"></i> Kirim ke CS</button><button class="nb-btn yel" id="paid" disabled style="opacity:.45"><i class="ri-whatsapp-line"></i> Saya Sudah Bayar</button></div>
   </div>
   <div id="step3" class="hide done-box">
     <div class="big">✅</div><h2 style="font-size:22px;font-weight:800;margin-top:6px">Pembayaran Diterima</h2>
@@ -227,6 +228,13 @@ async function createOrder(r){
   const all = getOrders(); all.unshift(o); setOrders(all); renderOrders(); if (window.Snd) Snd.coin(); FX.toast('Pesanan dibuat: ' + o.id, 'ok'); if (!o.gateway) notifyAdmin(orderText(o, '🛒 PESANAN BARU (belum dibayar)')); showPay(o);   // jalur OrderKuota: worker yang mengabari owner/CS
 }
 
+const fmtNo = n => ('0' + String(n || '').replace(/\D/g, '').replace(/^62/, '')).replace(/(\d{4})(?=\d)/g, '$1-');
+function fillAdminNo(){
+  const link = (n, label) => '<a href="https://wa.me/' + String(n).replace(/\D/g, '') + '" target="_blank" rel="noopener" style="color:inherit"><b>' + fmtNo(n) + '</b></a>' + (label ? ' <small>(' + label + ')</small>' : '');
+  let h = '<span><i class="ri-whatsapp-line"></i> Admin' + (SHOP.cs && SHOP.cs !== SHOP.wa ? '' : '/CS') + ': ' + link(SHOP.wa) + '</span>';
+  if (SHOP.cs && SHOP.cs !== SHOP.wa) h += '<span><i class="ri-customer-service-2-line"></i> CS: ' + link(SHOP.cs) + '</span>';
+  $('adminNo').innerHTML = h;
+}
 function setMethod(m){ $('mtabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === m)); $('waBox').classList.toggle('hide', m !== 'wa'); $('qrisBox').classList.toggle('hide', m !== 'qris'); $('walletBox').classList.toggle('hide', m !== 'wallet'); }
 $('mtabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; setMethod(b.dataset.m); if (b.dataset.m === 'wa') payViaWa(); };
 $('waPay').onclick = () => payViaWa();
@@ -236,7 +244,7 @@ function payViaWa(){
   const t = orderText(o, '🛒 MAU BAYAR — metode: WhatsApp Admin/CS') + '\nMohon kirim cara pembayaran. Terima kasih 🙏';
   window.open('https://wa.me/' + (SHOP.cs || SHOP.wa) + '?text=' + encodeURIComponent(t), '_blank');
 }
-$('paidCs').onclick = () => sendProof(SHOP.cs);
+$('paidCs').onclick = () => sendProof(SHOP.cs || SHOP.wa);
 $('cpAmt').onclick = async () => { const o = getOrders().find(x => x.id === activeId); if (!o) return; try{ await navigator.clipboard.writeText(String(o.total)); FX.toast('Nominal disalin: ' + rupiah(o.total), 'ok'); }catch(e){} };
 $('dlQr').onclick = async () => { const src = $('qris').src; try{ const b = await (await fetch(src)).blob(), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'qris-' + activeId + '.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }catch(e){ window.open(src, '_blank'); } };
 function showPay(o){
@@ -250,7 +258,7 @@ function showPay(o){
   $('payHint').innerHTML = o.gateway ? 'Scan QRIS — nominal sudah <b>otomatis</b> terisi (bisa termasuk biaya layanan):' : 'Transfer <b>tepat</b> sesuai nominal (termasuk kode unik):';
   $('autoSt').innerHTML = '<span><i class="ri-loader-4-line spin"></i> Menunggu pembayaran — terdeteksi otomatis</span>'; $('autoSt').style.display = o.gateway ? '' : 'none'; $('paid').innerHTML = o.gateway ? '<i class="ri-whatsapp-line"></i> Sudah bayar, belum terdeteksi' : '<i class="ri-whatsapp-line"></i> Saya Sudah Bayar';
   $('step3').classList.add('hide');
-  $('qris').src = o.qrUrl || SHOP.qrisImage; setProof(null); setMethod('wa'); $('qrisNote').innerHTML = (SHOP.qrisName ? 'QRIS a.n. <b>' + SHOP.qrisName + '</b>. ' : '') + 'Bisa dibayar pakai DANA, GoPay, OVO, ShopeePay, LinkAja atau m-banking apa saja. Bayar <b>tepat</b> sesuai nominal.'; $('paidCs').style.display = SHOP.cs ? '' : 'none';
+  $('qris').src = o.qrUrl || SHOP.qrisImage; setProof(null); setMethod('wa'); $('qrisNote').innerHTML = (SHOP.qrisName ? 'QRIS a.n. <b>' + SHOP.qrisName + '</b>. ' : '') + 'Bisa dibayar pakai DANA, GoPay, OVO, ShopeePay, LinkAja atau m-banking apa saja. Bayar <b>tepat</b> sesuai nominal.'; $('paidCs').style.display = ''; fillAdminNo();
   $('wallets').innerHTML = '';
   SHOP.ewallets.forEach(w => { const d=document.createElement('div'); d.className='pay-line'; d.innerHTML='<span></span><button class="nb-btn" style="padding:6px 10px;box-shadow:0 2px 14px var(--glow)"></button>';
     d.firstChild.textContent = w.name; const b=d.lastChild; b.textContent = w.no;
