@@ -23,7 +23,7 @@ window.SHOP = {
   /* Pembayaran memakai QRIS sendiri (a.n. yannLytr) — bayar lalu tekan "Saya Sudah Bayar", admin cek & proses.
      Ganti gambar QRIS lewat qrisImage di atas (link gambar atau file lokal, mis. "img/qris.jpg"). */
   qrisName: "YANNLYTR , DIGITAL & KREATIF",
-  cs: "",   // nomor WhatsApp CS (awalan 62), opsional — memunculkan tombol "Kirim ke CS" di halaman bayar
+  cs: "6285842176747",   // nomor WhatsApp CS (awalan 62), opsional — memunculkan tombol "Kirim ke CS" di halaman bayar
 
   /* Sisa stok yang tampil di toko (isi manual, ubah angkanya tiap stok berubah). Kunci = nama produk persis.
      Contoh: stock: {"Netflix Premium": 5, "Capcut Pro": 12}. 0 = "Stok habis" (tombol beli nonaktif). Produk yang tidak ditulis = tanpa label stok. */
