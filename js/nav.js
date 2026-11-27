@@ -1,6 +1,6 @@
 /* Header neo bersama untuk semua halaman (brand + menu). Dipasang di <div id="siteNav"></div> */
 (function(){
-  const LINKS=[['index.html','Home'],['produk.html','Toko'],['tools.html','Tools'],['dasboard.html','Dashboard'],['portofolio.html','Portofolio'],['about.html','About'],['skill.html','Skills'],['service.html','Service'],['contact.html','Contact'],['payment.html','Payment'],['yanzii-AI.html','yanzii-AI'],["Alqur'an.html","Al-Qur'an"]];
+  const LINKS=[['index.html','Home'],['produk.html','Toko'],['tools.html','Tools'],['dasboard.html','Dashboard'],['portofolio.html','Portofolio'],['about.html','About'],['skill.html','Skills'],['service.html','Service'],['contact.html','Contact'],['payment.html','Payment'],['yanzii-AI.html','yanzii-AI'],["Alqur'an.html","Al-Qur'an"],['admin.html','Admin']];
   const cur=(location.pathname.split('/').pop()||'index.html');
   const host=document.getElementById('siteNav')||document.body.insertBefore(Object.assign(document.createElement('div'),{id:'siteNav'}),document.body.firstChild);
   const brand=(window.SHOP&&SHOP.brand)||'Yanzii';
