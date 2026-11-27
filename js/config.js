@@ -43,7 +43,7 @@ window.SHOP = {
   notifyUrl: "",
 
   /* Kode voucher (contoh — ubah sesuai kebutuhan). type: pct = persen, flat = potongan rupiah */
-  vouchers: { "MN-10RXY25": {type:"pct", v:15, desc:"Diskon 15%"}, "HEMAT10K": {type:"flat", v:10000, desc:"Potongan Rp10.000"} },
+  vouchers: { "MN-10RXY25": {type:"pct", v:10, desc:"Diskon 10%"}, "HEMAT10K": {type:"flat", v:10000, desc:"Potongan Rp10.000"} },
 
   /* Kategori: id, nama, ikon, warna kartu, deskripsi singkat */
   cats: [
