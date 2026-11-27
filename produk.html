@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toko — Yanzii</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="css/neo.css">
+<style>
+ .pcard{background:var(--card);border:3px solid var(--bd);border-radius:18px;box-shadow:0 2px 26px var(--glow);overflow:hidden;display:flex;flex-direction:column}
+ .pcard img{width:100%;aspect-ratio:4/3;object-fit:cover;border-bottom:3px solid var(--bd);background:var(--inp)}
+ .pcard .b{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}.pcard .b p{font-size:13px;color:var(--mut);flex:1}
+ .price{font-weight:800;font-size:18px}
+ .pay-line{display:flex;justify-content:space-between;align-items:center;gap:10px;border:2px solid var(--bd);border-radius:12px;padding:10px 12px;margin-top:8px;font-weight:700}
+ .total{font-size:30px;font-weight:800;letter-spacing:-1px}
+ .ord{border:2px solid var(--bd);border-radius:14px;padding:14px;margin-top:12px;background:var(--card)}
+ .ord .h{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+ dialog{border:3px solid var(--bd);border-radius:22px;box-shadow:0 4px 38px var(--glow);padding:22px;max-width:480px;width:calc(100% - 32px);font-family:inherit}
+ dialog::backdrop{background:rgba(0,0,0,.55)}
+ .spin{display:inline-block;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+ .pcard .b .auto{margin-top:4px}
+ .stk{font-size:12.5px;font-weight:800;min-height:16px}.stk.ok{color:#4ade80}.stk.low{color:#fbbf24}.stk.out{color:#f87171}
+ .mtabs{display:flex;gap:8px;margin-top:12px}.mtabs button{flex:1;border:2px solid var(--bd);border-radius:12px;padding:10px 6px;font:inherit;font-weight:800;background:var(--card);color:inherit;cursor:pointer}.mtabs button.on{background:#38bdf8;color:#04121f}
+</style>
+<link rel="stylesheet" href="css/nebula.css">
+<link rel="stylesheet" href="css/fx.css">
+</head>
+<body>
+<script src="js/config.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/guard.js"></script>
+<div id="siteNav"></div>
+
+<div class="wrap">
+  <span class="badge"><i class="ri-qr-code-line"></i> BAYAR PAKAI QRIS</span>
+  <h1 class="t">Toko</h1>
+  <p class="sub">Ketuk <b>⚡ Beli Cepat</b> → data diisi dari akunmu, invoice & QRIS langsung muncul → pilih <b>WA Admin/CS</b> (atau QRIS) → tekan <b>Saya Sudah Bayar</b> → langsung chat admin.</p>
+  <div class="chips" id="chips"></div>
+  <div class="row" style="margin-top:4px;align-items:center"><input class="inp" id="q" placeholder="Cari produk… (mis. vps, capcut, panel)" style="flex:1 1 220px"><select class="inp" id="sort" style="flex:0 0 190px;min-width:0"><option value="">Urutan: bawaan</option><option value="lo">Harga termurah</option><option value="hi">Harga termahal</option><option value="az">Nama A–Z</option></select><span class="tag" id="count" style="flex:0 0 auto"></span></div>
+  <div class="grid" id="grid" style="margin-top:18px"></div>
+
+  <div class="panel"><h2>Pesanan Saya</h2><div id="orders"><p class="sub" style="margin-top:10px">Belum ada pesanan.</p></div></div>
+</div>
+
+<!-- Dialog order -->
+<dialog id="dlg">
+  <div id="step1">
+    <h2 id="dName" style="font-size:22px;font-weight:800"></h2>
+    <p class="sub" id="dPrice"></p>
+    <span class="tag" id="dCat"></span>
+    <label class="lbl">Nama</label><input class="inp" id="bn" maxlength="40" autocomplete="name">
+    <label class="lbl">No. WhatsApp (62…)</label><input class="inp" id="bw" inputmode="tel" placeholder="62812xxxxxxx">
+    <div id="dyn"></div>
+    <div id="qtyBox"><label class="lbl" id="qtyLbl">Jumlah</label><input class="inp" id="qty" type="number" min="1" max="99" value="1"></div>
+    <label class="lbl">Catatan</label><input class="inp" id="note" maxlength="100" placeholder="opsional">
+    <label class="lbl">Kode Voucher</label>
+    <div class="row" style="gap:8px;flex-wrap:nowrap"><input class="inp" id="vc" placeholder="opsional" maxlength="20" style="text-transform:uppercase"><button type="button" class="nb-btn" id="vcBtn" style="flex:0 0 auto;min-width:0">Pakai</button></div>
+    <div class="small" id="vcMsg" style="margin-top:6px"></div>
+    <div class="pay-line"><span id="sumTxt"></span><b id="sumVal"></b></div>
+    <div id="dmsg" class="msg err hide"></div>
+    <div class="row" style="margin-top:18px"><button class="nb-btn" id="cancel">Batal</button><button class="nb-btn dark" id="create">Buat Pesanan</button></div>
+  </div>
+  <div id="step2" class="hide">
+    <span class="badge" id="invId"></span>
+    <div class="ord" id="paySum" style="margin-top:12px"></div>
+    <p class="sub" style="margin-top:12px" id="payHint">Transfer <b>tepat</b> sesuai nominal (termasuk kode unik):</p>
+    <div class="total" id="payTotal"></div>
+    <p class="sub">Batas bayar: <b id="left"></b></p>
+    <div class="pay-line" id="autoSt" style="border-color:#4ade80"><span><i class="ri-loader-4-line spin"></i> Menunggu pembayaran — terdeteksi otomatis</span></div>
+    <div class="mtabs" id="mtabs"><button type="button" class="on" data-m="wa">💬 WA Admin/CS</button><button type="button" data-m="qris">⚡ QRIS</button><button type="button" data-m="wallet">💳 Transfer Manual</button></div>
+    <div id="waBox"><p class="sub" style="margin-top:12px;font-size:12.5px">Pilih metode ini untuk <b>langsung chat Admin/CS di WhatsApp</b> — rincian pesanan terisi otomatis, admin kirim cara bayar & memproses.</p><button type="button" class="nb-btn yel block" id="waPay" style="margin-top:10px"><i class="ri-whatsapp-line"></i> Bayar via WA Admin/CS</button></div>
+    <div id="qrisBox" class="hide">
+      <img id="qris" alt="QRIS" style="width:100%;border:3px solid var(--bd);border-radius:14px;margin-top:12px">
+      <div class="row" style="margin-top:10px"><button type="button" class="nb-btn" id="cpAmt">Salin Nominal</button><button type="button" class="nb-btn" id="dlQr">Simpan QR</button></div>
+      <p class="sub" style="margin-top:8px;font-size:12.5px" id="qrisNote">Bisa dibayar pakai DANA, GoPay, OVO, ShopeePay, LinkAja atau m-banking apa saja — cukup scan. Bayar <b>tepat</b> sesuai nominal.</p>
+    </div>
+    <div id="walletBox" class="hide"><p class="sub" style="margin-top:12px;font-size:12.5px">Transfer <b>tepat</b> sesuai nominal, lalu tekan “Saya Sudah Bayar”. Setelah itu kirim bukti transfer ke admin.</p><div id="wallets"></div></div>
+    <div style="margin-top:14px"><label class="lbl">Bukti transfer (screenshot) — <b>WAJIB</b></label><input type="file" id="proof" accept="image/*" class="inp"><img id="proofPrev" alt="Bukti transfer" class="hide" style="width:100%;max-height:220px;object-fit:contain;border:2px solid var(--bd);border-radius:12px;margin-top:8px"><p class="sub" style="font-size:12.5px;margin-top:6px">Upload screenshot bukti bayar dulu, baru tombol “Saya Sudah Bayar” aktif. <b>Tanpa bukti transfer, pesanan tidak diproses.</b></p></div>
+    <div class="pay-line" id="proofInfo" style="margin-top:18px;display:block;font-size:12.5px;line-height:1.5"><i class="ri-information-line"></i> <b>Info bukti transfer:</b> setelah menekan <b>Kirim ke CS</b> atau <b>Saya Sudah Bayar</b>, chat WhatsApp owner akan terbuka. <b>Lampirkan screenshot bukti transfer</b> di chat tersebut lalu kirim. Tanpa bukti transfer, pesanan tidak diproses.</div>
+    <div class="row" style="margin-top:10px"><button class="nb-btn" id="close2">Tutup</button><button class="nb-btn" id="paidCs" style="display:none;opacity:.45" disabled><i class="ri-customer-service-2-line"></i> Kirim ke CS</button><button class="nb-btn yel" id="paid" disabled style="opacity:.45"><i class="ri-whatsapp-line"></i> Saya Sudah Bayar</button></div>
+  </div>
+  <div id="step3" class="hide done-box">
+    <div class="big">✅</div><h2 style="font-size:22px;font-weight:800;margin-top:6px">Pembayaran Diterima</h2>
+    <p class="sub" id="doneTxt" style="margin-top:8px"></p>
+    <div class="row" style="margin-top:18px;justify-content:center"><button class="nb-btn" id="close3">Tutup</button><button class="nb-btn yel" id="doneWa"><i class="ri-whatsapp-line"></i> Chat Admin</button></div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+const KEY = 'orders_v1';
+let user = null; try{ user = JSON.parse(sessionStorage.getItem('loggedUser')||'null'); }catch(e){}
+
+const getOrders = () => { try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } };
+const setOrders = o => { try{ localStorage.setItem(KEY, JSON.stringify(o)); }catch(e){} };
+const orderText = (o, t) => buyerText(t, Object.assign({}, buyer(), {nama: o.name, wa: o.phone})) + '\n\n*Invoice:* ' + o.id + '\n*Produk:* ' + o.item + ' x' + o.qty + (o.unit ? ' ' + o.unit : '') + (o.extra || []).map(e => '\n' + e[0] + ': ' + e[1]).join('') + (o.voucher ? '\nVoucher: ' + o.voucher : '') + '\n*Total:* ' + rupiah(o.total) + (o.note ? '\nCatatan: ' + o.note : '');
+const wa = txt => window.open('https://wa.me/' + SHOP.wa + '?text=' + encodeURIComponent(txt), '_blank');
+
+// ---- katalog (kategori + cari) ----
+const CATS = SHOP.cats, CAT = {}; CATS.forEach(c => CAT[c.id] = c);
+const FAVK = 'fav_v1', favs = () => { try{ return JSON.parse(localStorage.getItem(FAVK)||'[]'); }catch(e){ return []; } };
+const okCat = h => h === 'fav' || CAT[h];
+let curCat = okCat(location.hash.slice(1)) ? location.hash.slice(1) : 'all', q = '', sortBy = '';
+function chips(){
+  const box = $('chips'); box.innerHTML = '';
+  [{id:'all',name:'Semua',icon:'✨'},{id:'fav',name:'Favorit',icon:'❤️'}].concat(CATS).forEach(c => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (c.id === curCat ? ' on' : ''); if (CAT[c.id]) b.appendChild(pIcon(c.id)); else b.appendChild(document.createTextNode(c.icon + ' ')); b.appendChild(document.createTextNode(' ' + c.name));
+    b.onclick = () => { curCat = c.id; history.replaceState(null, '', c.id === 'all' ? location.pathname : '#' + c.id); chips(); render(); };
+    box.appendChild(b); });
+  const on = box.querySelector('.on'); if (on && on.scrollIntoView) on.scrollIntoView({inline:'center', block:'nearest'});
+}
+function render(){
+  const g = $('grid'); g.innerHTML = '';
+  const fv = favs(), list = SHOP.products.filter(p => (curCat === 'all' || (curCat === 'fav' ? fv.includes(p.id) : p.cat === curCat)) && (!q || (p.name + ' ' + p.desc).toLowerCase().includes(q)));
+  if (sortBy === 'lo') list.sort((a, b) => a.price - b.price); else if (sortBy === 'hi') list.sort((a, b) => b.price - a.price); else if (sortBy === 'az') list.sort((a, b) => a.name.localeCompare(b.name));
+  $('count').textContent = list.length + ' produk';
+  if (!list.length){ g.innerHTML = '<p class="empty">' + (curCat === 'fav' ? 'Belum ada favorit. Ketuk ❤ pada produk.' : 'Produk tidak ditemukan.') + '</p>'; return; }
+  list.forEach(p => {
+    const k = CAT[p.cat] || {}, c = document.createElement('div'); c.className = 'pcard';
+    c.innerHTML = '<div class="art"><span></span></div><div class="b"><b></b><p></p><div class="price"></div><div class="stk"></div><button class="nb-btn yel auto"><i class="ri-flashlight-fill"></i> Beli Cepat</button><button class="nb-btn man" style="padding:7px 12px;font-size:12.5px">Isi data manual</button></div>';
+    const art = c.querySelector('.art'); art.style.setProperty('--c1', k.c1 || '#0284c7'); art.style.setProperty('--c2', k.c2 || '#2563eb'); art.firstChild.appendChild(pIcon(p));
+    const hb = document.createElement('button'); hb.type = 'button'; hb.className = 'heart' + (fv.includes(p.id) ? ' on' : ''); hb.textContent = '♥'; hb.setAttribute('aria-label', 'Favorit');
+    hb.onclick = () => { let f = favs(); const had = f.includes(p.id); f = had ? f.filter(x => x !== p.id) : f.concat(p.id); try{ localStorage.setItem(FAVK, JSON.stringify(f)); }catch(e){} hb.classList.toggle('on', !had); FX.toast(had ? 'Dihapus dari favorit' : '❤ Ditambah ke favorit'); if (curCat === 'fav') render(); };
+    art.appendChild(hb);
+    if (p.badge){ const e = document.createElement('em'); e.className = 'pbadge'; e.textContent = p.badge; art.appendChild(e); }
+    c.querySelector('b').textContent = p.name; c.querySelector('p').textContent = p.desc;
+    c.querySelector('.price').textContent = rupiah(p.price) + (p.u ? ' / ' + p.u : '');
+    c.dataset.pid = p.id; c.dataset.name = p.name; c.querySelector('.auto').onclick = () => openOrder(p, true); c.querySelector('.man').onclick = () => openOrder(p);
+    g.appendChild(c); });
+  if (window.FX) FX.reveal(g); paintStock();
+}
+// ---- sisa stok (dari worker OrderKuota) ----
+let STOCK = null;
+function paintStock(){
+  document.querySelectorAll('.pcard[data-pid]').forEach(c => {
+    const sk = String(c.dataset.name || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+    const n = STOCK ? (STOCK[sk] !== undefined ? STOCK[sk] : STOCK[c.dataset.name] !== undefined ? STOCK[c.dataset.name] : STOCK[c.dataset.pid]) : undefined, s = c.querySelector('.stk'); if (!s) return;
+    if (n === undefined){ s.textContent = ''; s.className = 'stk'; return; }
+    s.className = 'stk ' + (n <= 0 ? 'out' : n <= 3 ? 'low' : 'ok');
+    s.textContent = n <= 0 ? '● Stok habis' : (n <= 3 ? '● Tinggal ' : '● Sisa ') + n;
+    c.querySelectorAll('button.auto,button.man').forEach(b => { b.disabled = n <= 0; b.style.opacity = n <= 0 ? .45 : ''; });
+  });
+}
+// stok: angka acak 5-99 dari config, diganti angka asli server bila ada data stok
+async function loadStock(){
+  if (!SHOP.gatewayUrl){ STOCK = SHOP.stock || null; paintStock(); return; }
+  try{ const r = await fetch(SHOP.gatewayUrl.replace(/\/+$/, '') + '/stockinfo'); const j = await r.json(); STOCK = Object.assign({}, SHOP.stock || {}, j.stock || {}); paintStock(); }catch(e){}
+}
+$('sort').onchange = e => { sortBy = e.target.value; render(); };
+$('q').oninput = e => { q = e.target.value.trim().toLowerCase(); render(); };
+addEventListener('hashchange', () => { const h = location.hash.slice(1); curCat = okCat(h) ? h : 'all'; chips(); render(); });
+chips(); render();
+
+// ---- dialog ----
+const dlg = $('dlg'); let cur = null, timer = null, activeId = null;
+const FM = p => SHOP.forms[p.cat] || {qty:['Jumlah','',1,99], exp:SHOP.orderExpireMinutes, f:[]};
+const FIXED = ['project','kasus','script','sekali'];
+let extras = {}, vch = null;
+const disc = sub => !vch ? 0 : vch.type === 'pct' ? Math.floor(sub * vch.v / 100) : Math.min(vch.v, Math.max(0, sub - 1000));
+function qtyCfg(p){ const f = FM(p), fixed = FIXED.includes(p.u) || f.qty[3] <= 1; return {label:f.qty[0], min:f.qty[2], max: fixed ? 1 : f.qty[3], fixed}; }
+const LK = c => 'last_extra_' + ((user && user.email) || 'tamu') + '_' + c;
+function openOrder(p, auto){
+  cur = p; activeId = null; extras = {}; vch = null; $('vc').value = ''; $('vcMsg').textContent = '';
+  const f = FM(p), qc = qtyCfg(p), k = CAT[p.cat] || {};
+  $('dName').textContent = p.name; $('dPrice').textContent = rupiah(p.price) + (p.u ? ' / ' + p.u : '');
+  $('dCat').textContent = k.name || 'Produk';
+  $('bn').value = (user && !user.guest && user.nama) || ''; $('bw').value = (user && user.wa) || ''; $('note').value = ''; $('dmsg').classList.add('hide');
+  $('qtyLbl').textContent = qc.label; $('qty').min = qc.min; $('qty').max = qc.max; $('qty').value = qc.min; $('qtyBox').classList.toggle('hide', qc.fixed);
+  const dyn = $('dyn'); dyn.innerHTML = '';
+  f.f.forEach(([key, label, ph, req, type]) => {
+    const l = document.createElement('label'); l.className = 'lbl'; l.textContent = label + (req ? '' : ' (opsional)'); dyn.appendChild(l);
+    let el;
+    if (type === 'area'){ el = document.createElement('textarea'); el.rows = 3; }
+    else if (type.startsWith('select:')){ el = document.createElement('select'); type.slice(7).split('|').forEach(o => { const op = document.createElement('option'); op.textContent = o; el.appendChild(op); }); }
+    else { el = document.createElement('input'); if (type === 'email'){ el.type = 'email'; el.autocomplete = 'email'; } }
+    el.className = 'inp'; el.dataset.k = key; el.dataset.l = label; if (ph) el.placeholder = ph; if (el.maxLength !== undefined && type !== 'area') el.maxLength = 120; dyn.appendChild(el);
+  });
+  // isi otomatis: email akun + data yang dipakai terakhir untuk kategori ini
+  let last = {}; try{ last = JSON.parse(localStorage.getItem(LK(p.cat)) || '{}'); }catch(e){}
+  dyn.querySelectorAll('[data-k]').forEach(el => { const k = el.dataset.k; if (last[k] && (el.tagName !== 'SELECT' || [...el.options].some(o => o.value === last[k]))) el.value = last[k]; else if (k === 'email' && user && !user.guest && user.email) el.value = user.email; });
+  if ($('dlv')) $('dlv').innerHTML = ''; sum(); $('step1').classList.remove('hide'); $('step2').classList.add('hide'); $('step3').classList.add('hide');
+  $('create').textContent = auto ? '⚡ Bayar Otomatis' : 'Buat Pesanan';
+  if (auto){ const r = collect(); if (!r.err){ createOrder(r); return; } err('Lengkapi data ini dulu, setelah itu pesanan & pembayaran diproses otomatis: ' + r.err); }
+  show(dlg);
+}
+function qtyVal(){ const qc = qtyCfg(cur); return Math.max(qc.min, Math.min(qc.max, Math.round(+$('qty').value || qc.min))); }
+function sum(){ if (!cur) return; const n = qtyVal(); $('sumTxt').textContent = rupiah(cur.price) + ' × ' + n + (cur.u ? ' ' + cur.u : ''); const sub = cur.price * n, d = disc(sub); if (d) $('sumTxt').textContent += ' − diskon ' + rupiah(d); $('sumVal').textContent = rupiah(sub - d); }
+$('vcBtn').onclick = () => { const c = $('vc').value.trim().toUpperCase(), v = (SHOP.vouchers || {})[c];
+  if (!c){ vch = null; $('vcMsg').textContent = ''; } else if (!v){ vch = null; $('vcMsg').textContent = '✗ Kode voucher tidak valid.'; FX.toast('Voucher tidak valid', 'err'); } else { vch = Object.assign({code: c}, v); $('vcMsg').textContent = '✓ ' + v.desc + ' dipakai.'; FX.toast('Voucher dipakai: ' + c, 'ok'); } sum(); };
+$('qty').oninput = sum;
+function show(d){ if (d.showModal) d.showModal(); else d.setAttribute('open',''); }
+function hide(d){ if (d.close) d.close(); else d.removeAttribute('open'); clearInterval(timer); }
+$('cancel').onclick = () => hide(dlg); $('close2').onclick = () => hide(dlg); $('close3').onclick = () => hide(dlg);
+
+function err(t){ const m=$('dmsg'); m.textContent=t; m.classList.remove('hide'); }
+function genId(){ return 'YZ' + Date.now().toString(36).toUpperCase() + Math.floor(Math.random()*36).toString(36).toUpperCase(); }
+
+function collect(){
+  const name = $('bn').value.trim(), phone = $('bw').value.replace(/\D/g,''), qty = qtyVal(), f = FM(cur), ex = [], raw = {};
+  if (name.length < 2) return {err:'Isi nama kamu.'};
+  if (!/^62\d{8,13}$/.test(phone)) return {err:'Nomor WhatsApp harus diawali 62 (contoh 62812xxxxxxx).'};
+  for (const [key, label, , req, type] of f.f){
+    const el = $('dyn').querySelector('[data-k="' + key + '"]'), v = (el.value || '').trim();
+    if (req && !v) return {err: label + ' wajib diisi.'};
+    if (v && type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return {err: label + ' tidak valid.'};
+    if (v && type.startsWith('^') && !new RegExp(type, 'i').test(v)) return {err: label + ' formatnya belum sesuai.'};
+    if (v){ ex.push([label, v]); raw[key] = v; }
+  }
+  return {name, phone, qty, ex, raw};
+}
+$('create').onclick = () => { const r = collect(); if (r.err) return err(r.err); createOrder(r); };
+async function createOrder(r){
+  const {name, phone, qty, ex, raw} = r, f = FM(cur), exp = f.exp || SHOP.orderExpireMinutes;
+  try{ localStorage.setItem(LK(cur.cat), JSON.stringify(raw)); }catch(e){}
+  const unique = SHOP.gatewayUrl ? 0 : 1 + Math.floor(Math.random()*99);
+  const o = { id: genId(), pid: cur.id, cat: cur.cat, item: cur.name, unit: cur.u || '', qty, name, phone, extra: ex, note: $('note').value.trim(),
+    fields: raw, expMinutes: exp, owner: (user && !user.guest && user.email) || '', subtotal: cur.price*qty, disc: disc(cur.price*qty), voucher: vch ? vch.code : '', unique, total: cur.price*qty - disc(cur.price*qty) + unique, status: 'menunggu',
+    created: Date.now(), expires: Date.now() + exp*60000 };
+  $('create').disabled = true; $('dmsg').classList.add('hide');
+  if (SHOP.gatewayUrl){ try{
+      const res = await fetch(SHOP.gatewayUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(o)});
+      const j = await res.json().catch(() => ({})); if (!res.ok || j.error){ const er = new Error(j.error || ('HTTP ' + res.status)); er.user = res.status >= 400 && res.status < 500; throw er; }
+      if (j.total) o.total = j.total; if (j.amount) o.gwAmount = j.amount; if (j.qrUrl) o.qrUrl = j.qrUrl; if (j.payUrl) o.payUrl = j.payUrl; if (j.token) o.token = j.token; if (j.expires) o.expires = j.expires; o.gateway = true; o.unique = 0;
+    }catch(e){ if (e.user){ $('create').disabled = false; $('step2').classList.add('hide'); $('step3').classList.add('hide'); $('step1').classList.remove('hide'); err(e.message); if (!dlg.open) show(dlg); loadStock(); return; }
+      o.unique = 1 + Math.floor(Math.random()*99); o.total = o.subtotal - o.disc + o.unique; FX.toast('Gateway tidak merespons — pembayaran manual', 'err'); } }
+  $('create').disabled = false;
+  const all = getOrders(); all.unshift(o); setOrders(all); renderOrders(); if (window.Snd) Snd.coin(); FX.toast('Pesanan dibuat: ' + o.id, 'ok'); if (!o.gateway) notifyAdmin(orderText(o, '🛒 PESANAN BARU (belum dibayar)')); showPay(o);   // jalur OrderKuota: worker yang mengabari owner/CS
+}
+
+function setMethod(m){ $('mtabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === m)); $('waBox').classList.toggle('hide', m !== 'wa'); $('qrisBox').classList.toggle('hide', m !== 'qris'); $('walletBox').classList.toggle('hide', m !== 'wallet'); }
+$('mtabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; setMethod(b.dataset.m); if (b.dataset.m === 'wa') payViaWa(); };
+$('waPay').onclick = () => payViaWa();
+// metode WA: langsung buka chat Admin/CS berisi rincian pesanan
+function payViaWa(){
+  const o = getOrders().find(x => x.id === activeId); if (!o) return;
+  const t = orderText(o, '🛒 MAU BAYAR — metode: WhatsApp Admin/CS') + '\nMohon kirim cara pembayaran. Terima kasih 🙏';
+  window.open('https://wa.me/' + (SHOP.cs || SHOP.wa) + '?text=' + encodeURIComponent(t), '_blank');
+}
+$('paidCs').onclick = () => sendProof(SHOP.wa);
+$('cpAmt').onclick = async () => { const o = getOrders().find(x => x.id === activeId); if (!o) return; try{ await navigator.clipboard.writeText(String(o.total)); FX.toast('Nominal disalin: ' + rupiah(o.total), 'ok'); }catch(e){} };
+$('dlQr').onclick = async () => { const src = $('qris').src; try{ const b = await (await fetch(src)).blob(), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'qris-' + activeId + '.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }catch(e){ window.open(src, '_blank'); } };
+function showPay(o){
+  activeId = o.id;
+  $('step1').classList.add('hide'); $('step3').classList.add('hide'); $('step2').classList.remove('hide');
+  $('invId').textContent = 'INVOICE ' + o.id; $('payTotal').textContent = rupiah(o.total);
+  const ps = $('paySum'); ps.innerHTML = '';
+  const row = (a, b) => { const d = document.createElement('div'); d.className = 'pay-line'; d.style.marginTop = '6px'; d.innerHTML = '<span></span><b></b>'; d.children[0].textContent = a; d.children[1].textContent = b; ps.appendChild(d); };
+  row('Produk', o.item); row('Jumlah', o.qty + (o.unit ? ' ' + o.unit : '')); (o.extra || []).forEach(([a, b]) => row(a, b));
+  row('Subtotal', rupiah(o.subtotal)); if (o.disc) row('Diskon' + (o.voucher ? ' (' + o.voucher + ')' : ''), '−' + rupiah(o.disc)); if (o.unique) row('Kode unik', '+' + o.unique);
+  $('payHint').innerHTML = o.gateway ? 'Scan QRIS — nominal sudah <b>otomatis</b> terisi (bisa termasuk biaya layanan):' : 'Transfer <b>tepat</b> sesuai nominal (termasuk kode unik):';
+  $('autoSt').innerHTML = '<span><i class="ri-loader-4-line spin"></i> Menunggu pembayaran — terdeteksi otomatis</span>'; $('autoSt').style.display = o.gateway ? '' : 'none'; $('paid').innerHTML = o.gateway ? '<i class="ri-whatsapp-line"></i> Sudah bayar, belum terdeteksi' : '<i class="ri-whatsapp-line"></i> Saya Sudah Bayar';
+  $('step3').classList.add('hide');
+  $('qris').src = o.qrUrl || SHOP.qrisImage; setProof(null); setMethod('wa'); $('qrisNote').innerHTML = (SHOP.qrisName ? 'QRIS a.n. <b>' + SHOP.qrisName + '</b>. ' : '') + 'Bisa dibayar pakai DANA, GoPay, OVO, ShopeePay, LinkAja atau m-banking apa saja. Bayar <b>tepat</b> sesuai nominal.'; $('paidCs').style.display = '';
+  $('wallets').innerHTML = '';
+  SHOP.ewallets.forEach(w => { const d=document.createElement('div'); d.className='pay-line'; d.innerHTML='<span></span><button class="nb-btn" style="padding:6px 10px;box-shadow:0 2px 14px var(--glow)"></button>';
+    d.firstChild.textContent = w.name; const b=d.lastChild; b.textContent = w.no;
+    b.onclick = async () => { try{ await navigator.clipboard.writeText(w.no); b.textContent='Tersalin ✓'; FX.toast('Nomor disalin','ok'); setTimeout(()=>b.textContent=w.no,1400); }catch(e){} };
+    $('wallets').appendChild(d); });
+  if (o.payUrl){ const a=document.createElement('a'); a.className='nb-btn dark block'; a.style.marginTop='10px'; a.href=o.payUrl; a.target='_blank'; a.rel='noopener'; a.textContent='Bayar via Gateway'; $('wallets').appendChild(a); }
+  clearInterval(timer);
+  const tick = () => { const s = Math.max(0, Math.floor((o.expires-Date.now())/1000)); $('left').textContent = Math.floor(s/60) + 'm ' + String(s%60).padStart(2,'0') + 's';
+    if (s<=0){ clearInterval(timer); } };
+  tick(); timer = setInterval(tick, 1000); show(dlg);
+}
+
+function setProof(f){
+  const pv = $('proofPrev'); if (pv.dataset.u){ URL.revokeObjectURL(pv.dataset.u); pv.dataset.u = ''; }
+  if (!f){ $('proof').value = ''; pv.classList.add('hide'); } else { pv.dataset.u = URL.createObjectURL(f); pv.src = pv.dataset.u; pv.classList.remove('hide'); }
+  [$('paid'), $('paidCs')].forEach(b => { b.disabled = !f; b.style.opacity = f ? '' : .45; });
+}
+$('proof').onchange = e => { const f = e.target.files[0];
+  if (f && (!/^image\//.test(f.type) || f.size > 10*1024*1024)){ FX.toast('Pilih file gambar (screenshot) maks 10 MB', 'err'); return setProof(null); } setProof(f || null); };
+// simpan bukti di backend (admin hanya bisa memproses pesanan yang buktinya sudah masuk)
+async function uploadProof(o, f){
+  if (!SHOP.gatewayUrl || !o.gateway) return;
+  try{
+    const bmp = await createImageBitmap(f), k = Math.min(1, 1280 / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const r = await fetch(SHOP.gatewayUrl.replace(/\/+$/, '') + '/proof', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id:o.id, token:o.token, image:c.toDataURL('image/jpeg', .7)})});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    FX.toast('Bukti tersimpan di server ✓', 'ok');
+  }catch(e){ FX.toast('Bukti belum tersimpan di server — kirim juga lewat WhatsApp', 'err'); }
+}
+// kirim info pesanan + produk yang dibeli + screenshot bukti ke admin / CS
+async function sendProof(target){
+  const all = getOrders(), o = all.find(x => x.id === activeId), f = $('proof').files[0]; if (!o) return;
+  if (!f) return FX.toast('Bukti transfer wajib diupload — tanpa bukti pesanan tidak diproses', 'err');
+  uploadProof(o, f);   // paralel (tidak ditunggu) supaya tombol share/WA tetap dianggap klik langsung
+  if (o.status === 'menunggu'){ o.status = 'dibayar'; o.paidAt = Date.now(); setOrders(all); renderOrders(); }
+  const t = orderText(o, '💰 SUDAH BAYAR — mohon verifikasi') + '\n*Bukti transfer:* terlampir (screenshot)';
+  notifyAdmin(t);
+  window.open('https://wa.me/' + String(target || SHOP.wa).replace(/\D/g, '') + '?text=' + encodeURIComponent(t), '_blank');
+  FX.toast('Chat WhatsApp owner terbuka — kirim pesan & lampirkan screenshot bukti transfer.', 'ok'); hide(dlg);
+}
+$('paid').onclick = () => sendProof(SHOP.wa);
+
+// ---- daftar pesanan + status otomatis ----
+const LBL = { menunggu:['MENUNGGU BAYAR','wait'], dibayar:['MENUNGGU VERIFIKASI','wait'], diproses:['DIPROSES','wait'], lunas:['LUNAS • ADMIN PROSES','ok'], selesai:['SELESAI','ok'], expired:['KEDALUWARSA','bad'] };
+function sweep(){
+  const all = getOrders(); let ch = false;
+  all.forEach(o => { if (o.status==='menunggu' && Date.now()>o.expires){ o.status='expired'; ch=true; } });
+  if (ch) setOrders(all); return all;
+}
+function renderOrders(){
+  const me = (user && !user.guest && user.email) || '', all = sweep().filter(o => !o.owner || o.owner === me), box = $('orders');
+  if (!all.length){ box.innerHTML = '<p class="sub" style="margin-top:10px">Belum ada pesanan.</p>'; return; }
+  box.innerHTML = '';
+  all.slice(0,20).forEach(o => {
+    const [t,k] = LBL[o.status] || LBL.menunggu, d = document.createElement('div'); d.className = 'ord';
+    d.innerHTML = '<div class="h"><b></b><span class="tag ' + k + '">' + t + '</span></div><p class="sub" style="margin:6px 0 10px"></p><div class="row" style="gap:8px"></div>';
+    d.querySelector('b').textContent = o.id;
+    d.querySelector('p').textContent = o.item + ' x' + o.qty + ' — ' + rupiah(o.total) + ' — ' + new Date(o.created).toLocaleString('id-ID');
+    const r = d.querySelector('.row');
+    if (o.status==='menunggu'){ const b=document.createElement('button'); b.className='nb-btn yel'; b.textContent='Bayar'; b.onclick=()=>showPay(o); r.appendChild(b); }
+    if (o.delivery && o.delivery.length){ const v=document.createElement('button'); v.className='nb-btn yel'; v.textContent='Lihat Data'; v.onclick=()=>showDelivery(o); r.appendChild(v); }
+    const c = document.createElement('button'); c.className='nb-btn'; c.textContent='Tanya Admin'; c.onclick=()=>wa('Halo, saya mau tanya soal pesanan ' + o.id); r.appendChild(c);
+    box.appendChild(d);
+  });
+}
+// ---- deteksi pembayaran otomatis (gateway) ----
+function showDelivery(x){
+  $('step1').classList.add('hide'); $('step2').classList.add('hide'); $('step3').classList.remove('hide'); clearInterval(timer); activeId = x.id;
+  $('doneTxt').textContent = 'Invoice ' + x.id + ' — ' + x.item + ' (' + rupiah(x.total) + ')';
+  renderDelivery(x);
+  $('doneWa').onclick = () => wa(orderText(x, '✅ PESANAN LUNAS') + '\n\nTerima kasih!'); show(dlg);
+}
+function renderDelivery(x){
+  let box = $('dlv'); if (!box){ box = document.createElement('div'); box.id = 'dlv'; $('doneTxt').after(box); } box.innerHTML = '';
+  if (x.delivery && x.delivery.length){
+    const h = document.createElement('p'); h.className = 'sub'; h.style.cssText = 'margin-top:14px;font-weight:800'; h.textContent = 'DATA PESANANMU (juga dikirim ke WhatsApp ' + x.phone + '):'; box.appendChild(h);
+    x.delivery.forEach(t => { const d = document.createElement('div'); d.className = 'pay-line'; d.style.cssText = 'margin-top:8px;align-items:flex-start;gap:10px';
+      d.innerHTML = '<span style="word-break:break-all;white-space:pre-wrap;text-align:left"></span><button class="nb-btn" style="padding:6px 10px;flex:0 0 auto">Salin</button>';
+      d.firstChild.textContent = t; d.lastChild.onclick = async () => { try{ await navigator.clipboard.writeText(t); d.lastChild.textContent = 'Tersalin ✓'; FX.toast('Data disalin','ok'); }catch(e){} }; box.appendChild(d); });
+  }
+}
+function done(o, r){
+  r = r || {}; const all = getOrders(), x = all.find(v => v.id === o.id); if (!x || x.status === 'selesai' || (x.status === 'lunas' && r.dstate !== 'delivered')) return;   // 'lunas' naik jadi selesai saat admin sudah memproses
+  const ds = r.dstate;                                   // hanya ada jika memakai worker OrderKuota
+  if (ds === 'processing'){                              // supplier belum final → tetap polling
+    if (x.status !== 'diproses'){ x.status = 'diproses'; x.paidAt = Date.now(); setOrders(all); renderOrders(); FX.toast('Pembayaran diterima, pesanan diproses…', 'ok'); }
+    if (activeId === x.id && dlg.open){ $('autoSt').innerHTML = '<span><i class="ri-loader-4-line spin"></i> Pembayaran diterima — pesanan sedang diproses…</span>'; }
+    return;
+  }
+  x.status = (ds === 'manual' || ds === 'failed') ? 'lunas' : 'selesai'; x.paidAt = Date.now();
+  if (r.delivery && r.delivery.length) x.delivery = r.delivery; x.dstate = ds || ''; setOrders(all); renderOrders();
+  if (window.Snd){ try{ Snd.success(); }catch(e){} } FX.toast('✅ Pembayaran ' + x.id + ' diterima', 'ok');
+  if (!ds) notifyAdmin(orderText(x, '✅ LUNAS OTOMATIS — siap diproses'));   // worker OrderKuota mengabari owner/CS sendiri
+  if (activeId === x.id && dlg.open){
+    $('step1').classList.add('hide'); $('step2').classList.add('hide'); $('step3').classList.remove('hide'); clearInterval(timer);
+    const delivered = x.delivery && x.delivery.length;
+    $('doneTxt').textContent = 'Invoice ' + x.id + ' — ' + x.item + ' (' + rupiah(x.total) + ') sudah lunas. ' + (delivered ? 'Pesananmu sudah dikirim otomatis.' : (r.message || 'Admin segera memproses pesananmu.'));
+    renderDelivery(x);
+    $('doneWa').onclick = () => wa(orderText(x, '✅ PESANAN LUNAS') + '\n\nMohon diproses, terima kasih!');
+  }
+}
+let polling = false, pt = 0;
+async function poll(){
+  if (!SHOP.gatewayUrl || polling) return; polling = true;
+  try{
+    pt++; for (const o of getOrders().filter(x => x.gateway && (['menunggu','dibayar','diproses'].includes(x.status) || (x.status === 'lunas' && pt % 10 === 0 && Date.now() - (x.paidAt || 0) < 7*864e5)))){
+      try{ const r = await fetch(SHOP.gatewayUrl + (SHOP.gatewayUrl.includes('?') ? '&' : '?') + 'id=' + encodeURIComponent(o.id) + '&amount=' + (o.gwAmount || (o.subtotal - o.disc)) + (o.token ? '&token=' + encodeURIComponent(o.token) : '')); const j = await r.json();
+        if (j.status === 'paid') done(o, j); }catch(e){}
+    }
+  } finally { polling = false; }
+}
+renderOrders(); setInterval(renderOrders, 15000); setInterval(poll, 3000); poll(); loadStock(); setInterval(loadStock, 60000);
+})();
+</script>
+<script src="js/nav.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/bg3d.js"></script>
+<script src="js/clock.js"></script>
+</body>
+</html>
